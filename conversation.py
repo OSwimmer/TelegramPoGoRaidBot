@@ -1,4 +1,4 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler)
 
@@ -69,8 +69,19 @@ def opens(bot, update):
     update.message.reply_text('Thank you! So to summarize:\n' +
                               r.get_raid_info_as_string(username))
     bot.send_location(chat_id=update.message.chat_id, location=r.get_location(username))
-    bot.send_message(chat_id=r.group_chat_id, text=r.get_raid_info_with_loc_as_string(username))
+    post_in_group(bot, username)
+
     return ConversationHandler.END
+
+
+def post_in_group(bot, username):
+    keyboard = [[InlineKeyboardButton("Ik kom! met 0", callback_data='1'),
+                 InlineKeyboardButton("Ik kom niet!", callback_data='2')],
+
+                [InlineKeyboardButton("Random knop", callback_data='3')]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    bot.send_location(chat_id=r.group_chat_id, location=r.get_location(username))
+    bot.send_message(chat_id=r.group_chat_id, text=r.get_raid_info_as_string(username), reply_markup=reply_markup)
 
 
 def cancel(bot, update):
