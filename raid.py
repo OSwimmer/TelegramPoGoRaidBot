@@ -1,58 +1,99 @@
-raids = {}
-group_chat_id = -201461051
-
-
-def init_user(user):
-    raids[user] = {
+raids = [
+    {
         "boss": "",
         "gym": "",
         "location": "",
-        "opens": ""
-    }
+        "opens": "",
+        "players": {}
+    }]
+group_chat_id = -201461051
+global_raid_id = 0
 
 
-def set_boss(user, boss):
-    raids[user]["boss"] = boss
+def init_raid():
+    raids.append({
+        "boss": "",
+        "gym": "",
+        "location": "",
+        "opens": "",
+        "players": {}
+    })
 
 
-def set_gym(user, gym):
-    raids[user]["gym"] = gym
+def add_player_to_raid(username, raid_id):
+    raids[raid_id]["players"][username] = 0
 
 
-def set_location(user, location):
-    raids[user]["location"] = location
+def add_person_to_player(username, raid_id):
+    raids[raid_id]["players"][username] += 1
 
 
-def set_opentime(user, time):
-    raids[user]["opens"] = time
+def remove_person_from_player(username, raid_id):
+    if raids[raid_id]["players"][username] > 0:
+        raids[raid_id]["players"][username] -= 1
 
 
-def get_boss(user):
-    return raids[user]["boss"]
+def remove_player_from_raid(username, raid_id):
+    raids[raid_id]["players"].pop(username)
 
 
-def get_gym(user):
-    return raids[user]["gym"]
+def set_boss(raid_id, boss):
+    raids[raid_id]["boss"] = boss
 
 
-def get_location(user):
-    return raids[user]["location"]
+def set_gym(raid_id, gym):
+    raids[raid_id]["gym"] = gym
 
 
-def get_location_as_string(user):
-    loc = get_location(user)
+def set_location(raid_id, location):
+    raids[raid_id]["location"] = location
+
+
+def set_opentime(raid_id, time):
+    raids[raid_id]["opens"] = time
+
+
+def get_boss(raid_id):
+    return raids[raid_id]["boss"]
+
+
+def get_gym(raid_id):
+    return raids[raid_id]["gym"]
+
+
+def get_location(raid_id):
+    return raids[raid_id]["location"]
+
+
+def get_location_as_string(raid_id):
+    loc = get_location(raid_id)
     return str(loc.latitude) + " / " + str(loc.longitude)
 
 
-def get_opentime(user):
-    return raids[user]["opens"]
+def get_opentime(raid_id):
+    return raids[raid_id]["opens"]
 
 
-def get_raid_info_as_string(user):
-    return (get_boss(user) + ' raid at gym ' + get_gym(user) +
-            ' starting at ' + get_opentime(user) +
-            '\nPeople joining: ')
+def get_raid_info_as_string(raid_id):
+    return (get_boss(raid_id) + ' raid at gym ' + get_gym(raid_id) +
+            ' starting at ' + get_opentime(raid_id) +
+            '\nPeople joining:\n')
 
 
-def get_raid_info_with_loc_as_string(user):
-    return get_raid_info_as_string(user) + get_location_as_string(user)
+def get_raid_info_with_loc_as_string(raid_id):
+    return get_raid_info_as_string(raid_id) + get_location_as_string(raid_id)
+
+
+def get_players_as_string(raid_id):
+    result = ""
+    for player in raids[raid_id]["players"]:
+        result = result + "  " + player
+        persons = raids[raid_id]["players"][player]
+        if persons > 0:
+            result = result + " +" + str(persons)
+        result = result + "\n"
+    return result
+
+
+def get_full_raid_message(raid_id):
+    return get_raid_info_as_string(raid_id) + get_players_as_string(raid_id)

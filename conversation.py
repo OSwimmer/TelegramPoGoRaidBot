@@ -4,6 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 import logging
 import raid as r
+from keyboard import get_keyboard
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -17,7 +18,7 @@ BOSS, GYM, LOCATION, OPENS = range(4)
 def start(bot, update):
     reply_keyboard = [['Mewtwo', 'Snorlax', 'Magikarp', 'Tyranitar']]
     user = update.message.from_user.username
-    r.init_user(user)
+    r.init_raid()
 
     update.message.reply_text(
         'Hi! I will help you to add a raid. '
@@ -31,7 +32,7 @@ def start(bot, update):
 def boss(bot, update):
     user = update.message.from_user
     bossname = update.message.text
-    r.set_boss(user.username, bossname)
+    r.set_boss(r.global_raid_id, bossname)
     logger.info("Boss selected by %s: %s", user.first_name, bossname)
     update.message.reply_text('Now send me the name of the gym please.',
                               reply_markup=ReplyKeyboardRemove())
@@ -42,7 +43,7 @@ def boss(bot, update):
 def gym(bot, update):
     user = update.message.from_user
     gymname = update.message.text
-    r.set_gym(user.username, gymname)
+    r.set_gym(r.global_raid_id, gymname)
     logger.info("Gym selected by user %s: %s", user.first_name, gymname)
     update.message.reply_text('Episch! Now, send me the location please')
 
@@ -52,7 +53,7 @@ def gym(bot, update):
 def location(bot, update):
     user = update.message.from_user
     user_location = update.message.location
-    r.set_location(user.username, user_location)
+    r.set_location(r.global_raid_id, user_location)
     logger.info("Location of the raid %s: %f / %f", user.first_name, user_location.latitude,
                 user_location.longitude)
     update.message.reply_text('Super, now tell me when it opens, with the following format: HH:mm.')
@@ -64,24 +65,21 @@ def opens(bot, update):
     user = update.message.from_user
     username = user.username
     time = update.message.text
-    r.set_opentime(username, time)
+    r.set_opentime(r.global_raid_id, time)
     logger.info("Open time %s: %s", user.first_name, time)
     update.message.reply_text('Thank you! So to summarize:\n' +
-                              r.get_raid_info_as_string(username))
-    bot.send_location(chat_id=update.message.chat_id, location=r.get_location(username))
-    post_in_group(bot, username)
+                              r.get_raid_info_as_string(r.global_raid_id))
+    bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
+    post_in_group(bot)
+    r.global_raid_id += 1
 
     return ConversationHandler.END
 
 
-def post_in_group(bot, username):
-    keyboard = [[InlineKeyboardButton("Ik kom!", callback_data='1'),
-                 InlineKeyboardButton("Ik kom niet!", callback_data='2')],
-
-                [InlineKeyboardButton("Random knop", callback_data='3')]]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    bot.send_location(chat_id=r.group_chat_id, location=r.get_location(username))
-    bot.send_message(chat_id=r.group_chat_id, text=r.get_raid_info_as_string(username), reply_markup=reply_markup)
+def post_in_group(bot):
+    reply_markup = get_keyboard(r.global_raid_id)
+    bot.send_location(chat_id=r.group_chat_id, location=r.get_location(r.global_raid_id))
+    bot.send_message(chat_id=r.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup)
 
 
 def cancel(bot, update):
