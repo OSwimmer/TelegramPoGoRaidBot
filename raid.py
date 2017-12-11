@@ -51,7 +51,7 @@ def get_opentime(user):
 def get_raid_info_as_string(user):
     return (get_boss(user) + ' raid at gym ' + get_gym(user) +
             ' starting at ' + get_opentime(user) +
-            ' at the following location: ')
+            '\nPeople joining: ')
 
 
 def get_raid_info_with_loc_as_string(user):

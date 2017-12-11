@@ -56,22 +56,26 @@ def get_chat_id(bot, update):
 def button(bot, update):
     query = update.callback_query
     message = query.message
-    print("eens zien: " + str(message))
-    bot.edit_message_text(chat_id=r.group_chat_id, message_id=message.message_id, text="Verandert dit iets?")
     user = query.from_user
     username = user.username
+    print("eens zien: " + str(message))
     data = format(query.data)
+    new_message = message.text
     if data is "1":
-        add_person_to_raid(username)
+        new_message = add_person_to_raid(username, message.text)
     elif data is "2":
-        remove_person_from_raid(username)
+        new_message =
     elif data is "3":
-        print("random button lel")
+        remove_person_from_raid(username)
+    bot.edit_message_text(chat_id=r.group_chat_id, message_id=message.message_id, text=new_message, reply_markup=get_keyboard())
 
 
-def add_person_to_raid(user):
-    print("add person to raid")
-    return
+def add_player_to_person(user, message):
+    return "lel"
+
+
+def add_person_to_raid(user, message):
+    return message + "\n" + user
 
 
 def remove_person_from_raid(user):

@@ -75,7 +75,7 @@ def opens(bot, update):
 
 
 def post_in_group(bot, username):
-    keyboard = [[InlineKeyboardButton("Ik kom! met 0", callback_data='1'),
+    keyboard = [[InlineKeyboardButton("Ik kom!", callback_data='1'),
                  InlineKeyboardButton("Ik kom niet!", callback_data='2')],
 
                 [InlineKeyboardButton("Random knop", callback_data='3')]]
