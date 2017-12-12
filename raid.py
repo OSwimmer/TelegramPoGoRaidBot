@@ -1,18 +1,21 @@
 raids = [
     {
         "boss": "",
+        "moveset": [],
         "gym": "",
         "location": "",
         "opens": "",
         "players": {}
     }]
 group_chat_id = -201461051
+raid_bot_id = -201461051
 global_raid_id = 0
 
 
 def init_raid():
     raids.append({
         "boss": "",
+        "moveset": [],
         "gym": "",
         "location": "",
         "opens": "",
@@ -54,6 +57,14 @@ def set_location(raid_id, location):
 
 def set_opentime(raid_id, time):
     raids[raid_id]["opens"] = time
+
+
+def set_moveset(raid_id, moveset):
+    raids[raid_id]["moveset"] = moveset
+
+
+def get_moveset(raid_id):
+    return raids[raid_id]["moveset"]
 
 
 def get_boss(raid_id):

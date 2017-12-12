@@ -3,6 +3,7 @@ from telegram import InlineQueryResultArticle, InputTextMessageContent, ReplyKey
 import logging
 from conversation import get_add_raid_handler
 import raid as r
+import raid_bot as rb
 from keyboard import get_keyboard
 
 
@@ -66,6 +67,8 @@ def add_handlers(dispatcher):
     dispatcher.add_handler(add_raid_handler)
     chat_id_handler = CommandHandler('chatid', get_chat_id)
     dispatcher.add_handler(chat_id_handler)
+
+    # dispatcher.add_handler(rb.get_raid_bot_handler())
 
     callback_handler = CallbackQueryHandler(button)
     dispatcher.add_handler(callback_handler)

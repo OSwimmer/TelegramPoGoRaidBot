@@ -74,7 +74,7 @@ def opens(bot, update):
     logger.info("Open time %s: %s", user.first_name, time_str)
     update.message.reply_text('Thank you! So to summarize:\n' +
                               r.get_raid_info_as_string(r.global_raid_id))
-    bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
+    bot.send_message(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
     post_in_group(bot)
     r.global_raid_id += 1
 
