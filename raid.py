@@ -21,20 +21,23 @@ def init_raid():
 
 
 def add_player_to_raid(username, raid_id):
-    raids[raid_id]["players"][username] = 0
+    raids[raid_id]["players"][username] = {
+        "persons": 0,
+        "coming": True
+    }
 
 
 def add_person_to_player(username, raid_id):
-    raids[raid_id]["players"][username] += 1
+    raids[raid_id]["players"][username]['persons'] += 1
 
 
 def remove_person_from_player(username, raid_id):
-    if raids[raid_id]["players"][username] > 0:
-        raids[raid_id]["players"][username] -= 1
+    if raids[raid_id]["players"][username]["persons"] > 0:
+        raids[raid_id]["players"][username]["persons"] -= 1
 
 
 def remove_player_from_raid(username, raid_id):
-    raids[raid_id]["players"].pop(username)
+    raids[raid_id]["players"][username]['coming'] = False
 
 
 def set_boss(raid_id, boss):
@@ -87,8 +90,11 @@ def get_raid_info_with_loc_as_string(raid_id):
 def get_players_as_string(raid_id):
     result = ""
     for player in raids[raid_id]["players"]:
-        result = result + "  " + player
-        persons = raids[raid_id]["players"][player]
+        if raids[raid_id]["players"][player]['coming'] is True:
+            result = result + "  🔷 " + player
+        else:
+            result = result + "  ❌ " + player
+        persons = raids[raid_id]["players"][player]['persons']
         if persons > 0:
             result = result + " +" + str(persons)
         result = result + "\n"

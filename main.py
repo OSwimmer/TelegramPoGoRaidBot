@@ -6,49 +6,6 @@ import raid as r
 from keyboard import get_keyboard
 
 
-def start(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
-
-
-def caps(bot, update, args):
-    text_caps = ' '.join(args).upper()
-    bot.send_message(chat_id=update.message.chat_id, text=text_caps)
-
-
-def moo(message):
-    cow = (
-        ".        (__) \n"
-        "         (oo) \n"
-        "   /------\/  \n"
-        "  / |    ||   \n"
-        " *  /\---/\   \n"
-        "    ~~   ~~   \n"
-        " ")
-    return cow + message
-
-
-def inline_iets(bot, update):
-    query = update.inline_query.query
-    if not query:
-        return
-    results = list()
-    results.append(
-        InlineQueryResultArticle(
-            id=query + "doet dit iets?",
-            title="Hetzelfde",
-            input_message_content=InputTextMessageContent(query.upper() + " ik zeg altijd hetzelfde :v")
-        )
-    )
-    results.append(
-        InlineQueryResultArticle(
-            id=query + "moo",
-            title="MOO",
-            input_message_content=InputTextMessageContent(moo(query))
-        )
-    )
-    bot.answer_inline_query(update.inline_query.id, results)
-
-
 def get_chat_id(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="chat id is " + str(update.message.chat_id))
 
@@ -58,7 +15,8 @@ def button(bot, update):
     message = query.message
     user = query.from_user
     username = user.username
-    print("message: " + str(message))
+    if username is None:
+        username = user.first_name
     data = format(query.data)
     new_message = message.text
     button_id, raid_id = extract_from_button(data)
@@ -104,12 +62,6 @@ def unknown(bot, update):
 
 
 def add_handlers(dispatcher):
-    start_handler = CommandHandler('start', start)
-    dispatcher.add_handler(start_handler)
-    caps_handler = CommandHandler('caps', caps, pass_args=True)
-    dispatcher.add_handler(caps_handler)
-    inline_hetzelfde = InlineQueryHandler(inline_iets)
-    dispatcher.add_handler(inline_hetzelfde)
     add_raid_handler = get_add_raid_handler()
     dispatcher.add_handler(add_raid_handler)
     chat_id_handler = CommandHandler('chatid', get_chat_id)

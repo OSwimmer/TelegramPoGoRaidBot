@@ -1,7 +1,7 @@
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler)
-
+import time
 import logging
 import raid as r
 from keyboard import get_keyboard
@@ -64,9 +64,14 @@ def location(bot, update):
 def opens(bot, update):
     user = update.message.from_user
     username = user.username
-    time = update.message.text
-    r.set_opentime(r.global_raid_id, time)
-    logger.info("Open time %s: %s", user.first_name, time)
+    try:
+        time_obj = time.strptime(update.message.text, '%H:%M')
+        time_str = time.strftime('%H:%M', time_obj)
+    except ValueError:
+        bot.send_message(chat_id=update.message.chat_id, text="That is not a valid time format, please use HH:mm.")
+        return OPENS
+    r.set_opentime(r.global_raid_id, time_str)
+    logger.info("Open time %s: %s", user.first_name, time_str)
     update.message.reply_text('Thank you! So to summarize:\n' +
                               r.get_raid_info_as_string(r.global_raid_id))
     bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
