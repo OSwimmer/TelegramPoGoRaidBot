@@ -1,11 +1,11 @@
 from telegram.ext import MessageHandler, Filters, CommandHandler, Updater, InlineQueryHandler, CallbackQueryHandler
 from telegram import ParseMode, Location
-import logging
 from conversation import get_add_raid_handler
+from keyboard import get_keyboard
 import raid as r
 import static_data as s
-import raid_bot as rb
-from keyboard import get_keyboard
+
+import logging, requests, time, threading, configparser
 
 
 def get_chat_id(bot, update):
@@ -86,6 +86,10 @@ def unknown(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
 
 
+def silence(bot, update):
+    bot.send_message(chat_id=update.message.chat_id, text="Ssshh %s, you are beautiful when you don't talk" % update.message.from_user.username)
+
+
 def add_handlers(dispatcher):
     add_raid_handler = get_add_raid_handler()
     dispatcher.add_handler(add_raid_handler)
@@ -103,14 +107,25 @@ def add_handlers(dispatcher):
     unknown_handler = MessageHandler(Filters.command, unknown)
     dispatcher.add_handler(unknown_handler)
 
+    lulz_handler = MessageHandler(Filters.text, silence)
+    dispatcher.add_handler(lulz_handler)
+
+
+def pull_api():
+    print(time.ctime())
+    threading.Timer(60, pull_api).start()
+
 
 def main():
-    updater = Updater(token='430567701:AAH4_O4uu19JFTXhf2Sw-hmTgoi7tWSFWkk')
+    config = configparser.ConfigParser()
+    config.read("properties.ini")
+    updater = Updater(token=config["TelegramSettings"]["token"])
     dispatcher = updater.dispatcher
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     add_handlers(dispatcher)
-    updater.start_polling()
+    updater.start_polling(timeout=20)
+    # pull_api()
     print("Bot started!")
 
 

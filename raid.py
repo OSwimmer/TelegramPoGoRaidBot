@@ -144,12 +144,12 @@ def timeslot_to_icon_string(raid_id, user, slot):
         return s.TIMESLOT2_ICON
 
 
-def slots_to_string(slot1, slot2):
-    return "  Moment %s:\n%s\n  Moment %s:\n%s" % (s.TIMESLOT1_ICON, slot1, s.TIMESLOT2_ICON, slot2)
+def slots_to_string(slots, slot1, slot2):
+    return "  Moment %s %s:\n%s\n  Moment %s %s:\n%s" % (s.TIMESLOT1_ICON, slots[0], slot1, s.TIMESLOT2_ICON, slots[1], slot2)
 
 
 def get_players_as_string(raid_id):
-    result = "Spelers die komen:\n"
+    result = "\nSpelers die komen:\n"
     players_coming = [0, 0]
     players_arrived = [0, 0]
     slot1 = ""
@@ -174,7 +174,8 @@ def get_players_as_string(raid_id):
             slot1 = slot1 + line
         else:
             slot2 = slot2 + line
-    result = result + slots_to_string(slot1, slot2)
+    slots = get_timeslots(raid_id)
+    result = result + slots_to_string(slots, slot1, slot2)
     return result, players_coming[0] - players_arrived[0], players_coming[1] - players_arrived[1]
 
 

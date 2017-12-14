@@ -1,5 +1,5 @@
 
-# buttons
+# button numbers
 
 ADD_PLAYER_BUTTON_SLOT1 = "1"
 ADD_PLAYER_BUTTON_SLOT2 = "2"
