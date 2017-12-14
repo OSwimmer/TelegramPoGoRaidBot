@@ -1,8 +1,9 @@
 from telegram.ext import MessageHandler, Filters, CommandHandler, Updater, InlineQueryHandler, CallbackQueryHandler
-from telegram import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import ParseMode, Location
 import logging
 from conversation import get_add_raid_handler
 import raid as r
+import static_data as s
 import raid_bot as rb
 from keyboard import get_keyboard
 
@@ -21,15 +22,19 @@ def button(bot, update):
     data = format(query.data)
     new_message = message.text
     button_id, raid_id = extract_from_button(data)
-    if button_id is "1":
-        new_message = add_player_to_raid(username, message.text, raid_id)
-    elif button_id is "2":
+    if button_id is s.ADD_PLAYER_BUTTON_SLOT1:
+        new_message = add_player_to_raid(username, message.text, raid_id, 0)
+    elif button_id is s.ADD_PLAYER_BUTTON_SLOT2:
+        new_message = add_player_to_raid(username, message.text, raid_id, 1)
+    elif button_id is s.ADD_PERSON_BUTTON:
         new_message = add_person_to_player(username, message.text, raid_id)
-    elif button_id is "3":
+    elif button_id is s.REMOVE_PERSON_BUTTON:
         new_message = remove_person_from_player(username, message.text, raid_id)
-    elif button_id is "4":
+    elif button_id is s.PLAYER_ARRIVED_BUTTON:
+        new_message = player_has_arrived(username, message.text, raid_id)
+    elif button_id is s.REMOVE_PLAYER_BUTTON:
         new_message = remove_player_from_raid(username, message.text, raid_id)
-    bot.edit_message_text(chat_id=r.group_chat_id, message_id=message.message_id, text=new_message, reply_markup=get_keyboard(raid_id))
+    bot.edit_message_text(chat_id=s.group_chat_id, message_id=message.message_id, text=new_message, reply_markup=get_keyboard(raid_id), parse_mode=ParseMode.MARKDOWN)
 
 
 def extract_from_button(data):
@@ -37,15 +42,19 @@ def extract_from_button(data):
     return splitted[0], int(splitted[1])
 
 
+def player_has_arrived(user, message, raid_id):
+    r.player_has_arrived(user, raid_id)
+    return r.get_full_raid_message(raid_id)
+
+
 def add_person_to_player(user, message, raid_id):
     r.add_person_to_player(user, raid_id)
     return r.get_full_raid_message(raid_id)
 
 
-def add_player_to_raid(user, message, raid_id):
-    r.add_player_to_raid(user, raid_id)
+def add_player_to_raid(user, message, raid_id, timeslot):
+    r.add_player_to_raid(user, raid_id, timeslot)
     return r.get_full_raid_message(raid_id)
-    # return message + "\n  " + user
 
 
 def remove_person_from_player(user, message, raid_id):
@@ -58,6 +67,21 @@ def remove_player_from_raid(user, message, raid_id):
     return r.get_full_raid_message(raid_id)
 
 
+def add_test_raid(bot, update):
+    r.set_boss(r.global_raid_id, "TestBoss")
+    r.set_gym(r.global_raid_id, "TestGym")
+    location = Location(4.456874, 50.878761)
+    r.set_location(r.global_raid_id, location)
+    r.set_moveset(r.global_raid_id, ["TestQuick", "TestCharged"])
+    r.set_opentime(r.global_raid_id, "12:00")
+    r.set_timeslots(r.global_raid_id, ["12:05", "12:35"])
+
+    reply_markup = get_keyboard(r.global_raid_id)
+    bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
+    bot.send_message(chat_id=update.message.chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
+    r.global_raid_id += 1
+
+
 def unknown(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
 
@@ -67,6 +91,9 @@ def add_handlers(dispatcher):
     dispatcher.add_handler(add_raid_handler)
     chat_id_handler = CommandHandler('chatid', get_chat_id)
     dispatcher.add_handler(chat_id_handler)
+
+    add_test_raid_handler = CommandHandler('testRaid', add_test_raid)
+    dispatcher.add_handler(add_test_raid_handler)
 
     # dispatcher.add_handler(rb.get_raid_bot_handler())
 

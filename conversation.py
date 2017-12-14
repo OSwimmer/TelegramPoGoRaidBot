@@ -1,9 +1,10 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, ParseMode)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler)
 import time
 import logging
 import raid as r
+import static_data as s
 from keyboard import get_keyboard
 
 # Enable logging
@@ -73,8 +74,8 @@ def opens(bot, update):
     r.set_opentime(r.global_raid_id, time_str)
     logger.info("Open time %s: %s", user.first_name, time_str)
     update.message.reply_text('Thank you! So to summarize:\n' +
-                              r.get_raid_info_as_string(r.global_raid_id))
-    bot.send_message(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
+                              r.get_raid_info_as_string(r.global_raid_id), parse_mode=ParseMode.MARKDOWN)
+    bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
     post_in_group(bot)
     r.global_raid_id += 1
 
@@ -83,8 +84,8 @@ def opens(bot, update):
 
 def post_in_group(bot):
     reply_markup = get_keyboard(r.global_raid_id)
-    bot.send_location(chat_id=r.group_chat_id, location=r.get_location(r.global_raid_id))
-    bot.send_message(chat_id=r.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup)
+    bot.send_location(chat_id=s.group_chat_id, location=r.get_location(r.global_raid_id))
+    bot.send_message(chat_id=s.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 
 
 def cancel(bot, update):
