@@ -22,7 +22,3 @@ def parse_pokemon():
 
     with open(s.get_pokemon_file(), 'w') as outfile:
         json.dump(moves_pokemon, outfile)
-
-
-parse_moves()
-parse_pokemon()

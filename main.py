@@ -68,11 +68,11 @@ def remove_player_from_raid(user, message, raid_id):
 
 
 def add_test_raid(bot, update):
-    r.set_boss(r.global_raid_id, "TestBoss")
+    r.set_boss(r.global_raid_id, "151")
     r.set_gym(r.global_raid_id, "TestGym")
     location = Location(4.456874, 50.878761)
     r.set_location(r.global_raid_id, location)
-    r.set_moveset(r.global_raid_id, ["TestQuick", "TestCharged"])
+    r.set_moveset(r.global_raid_id, ["1", "2"])
     r.set_opentime(r.global_raid_id, "12:00")
     r.set_timeslots(r.global_raid_id, ["12:05", "12:35"])
 

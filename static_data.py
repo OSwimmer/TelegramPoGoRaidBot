@@ -1,4 +1,4 @@
-import configparser
+import configparser, json
 
 
 # button numbers
@@ -33,3 +33,7 @@ def get_moves_file():
 
 def get_pokemon_file():
     return config["GameData"]["pokemon_file"]
+
+
+moves = json.load(open(get_moves_file()))
+pokemon = json.load(open(get_pokemon_file()))

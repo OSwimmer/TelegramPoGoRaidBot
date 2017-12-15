@@ -54,7 +54,7 @@ def player_has_arrived(username, raid_id):
 
 
 def set_boss(raid_id, boss):
-    raids[raid_id]["boss"] = boss
+    raids[raid_id]["boss"] = get_boss_name(boss)
 
 
 def set_gym(raid_id, gym):
@@ -78,15 +78,25 @@ def get_timeslots(raid_id):
 
 
 def set_moveset(raid_id, moveset):
-    raids[raid_id]["moveset"] = moveset
+    raids[raid_id]["moveset"] = get_moveset_names(moveset)
 
 
 def get_moveset(raid_id):
     return raids[raid_id]["moveset"]
 
 
+def get_moveset_names(moveset):
+    quick = s.moves[moveset[0]]
+    charged = s.moves[moveset[1]]
+    return [quick, charged]
+
+
 def get_boss(raid_id):
     return raids[raid_id]["boss"]
+
+
+def get_boss_name(boss_id):
+    return s.pokemon[boss_id]
 
 
 def get_gym(raid_id):
@@ -127,9 +137,8 @@ def get_gym_line(raid_id):
 
 def get_boss_line(raid_id):
     moveset = get_moveset(raid_id)
-    quick_move = moveset[0]
-    charged_move = moveset[1]
-    result = "%s (%s / %s) Raid\n" % (toBold(get_boss(raid_id)), quick_move, charged_move)
+    boss = get_boss(raid_id)
+    result = "%s (%s / %s) Raid\n" % (toBold(boss), moveset[0], moveset[1])
     return result
 
 
