@@ -6,6 +6,7 @@ import raid as r
 import static_data as s
 
 import logging, requests, time, threading
+import datetime as dt
 
 
 def get_chat_id(bot, update):
@@ -68,13 +69,17 @@ def remove_player_from_raid(user, message, raid_id):
 
 
 def add_test_raid(bot, update):
+    r.init_raid()
     r.set_boss(r.global_raid_id, "151")
     r.set_gym(r.global_raid_id, "TestGym")
     location = Location(4.456874, 50.878761)
     r.set_location(r.global_raid_id, location)
     r.set_moveset(r.global_raid_id, ["1", "2"])
-    r.set_opentime(r.global_raid_id, "12:00")
-    r.set_timeslots(r.global_raid_id, ["12:05", "12:35"])
+    now_obj = dt.datetime.now()
+    now = now_obj.strftime('%H:%M')
+    r.set_opentime(r.global_raid_id, now)
+    slot1, slot2 = r.calculate_timeslots(now_obj)
+    r.set_timeslots(r.global_raid_id, [slot1, slot2])
 
     reply_markup = get_keyboard(r.global_raid_id)
     bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))

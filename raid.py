@@ -1,4 +1,6 @@
 import static_data as s
+import datetime as dt
+import time
 
 raids = [
     {
@@ -116,6 +118,33 @@ def get_opentime(raid_id):
     return raids[raid_id]["opens"]
 
 
+def get_opentime_from_end(end):
+    end_obj = dt.datetime.fromtimestamp(end)
+    return end_obj - dt.timedelta(minutes=45)
+
+
+def calculate_timeslots(start_obj):
+    slot1 = start_obj + dt.timedelta(minutes=5)
+    slot2 = start_obj + dt.timedelta(minutes=33)
+    slot1 = roundTime(slot1, 60*5)
+    slot2 = roundTime(slot2, 60*5)
+    print(str(slot1))
+    print(str(slot2))
+    return slot1.strftime('%H:%M'), slot2.strftime('%H:%M')
+
+
+def roundTime(obj=None, roundTo=60):
+    """Round a datetime object to any time laps in seconds
+    dt : datetime.datetime object, default now.
+    roundTo : Closest number of seconds to round to, default 1 minute.
+    Author: Thierry Husson 2012 - Use it as you want but don't blame me.
+    """
+    if obj is None: obj = dt.datetime.now()
+    seconds = (obj.replace(tzinfo=None) - obj.min).seconds
+    rounding = (seconds+roundTo/2) // roundTo * roundTo
+    return obj + dt.timedelta(0, rounding-seconds, -obj.microsecond)
+
+
 def toBold(string):
     return "*" + string + "*"
 
@@ -146,7 +175,7 @@ def get_raid_info_with_loc_as_string(raid_id):
     return get_raid_info_as_string(raid_id) + get_location_as_string(raid_id)
 
 
-def timeslot_to_icon_string(raid_id, user, slot):
+def timeslot_to_icon_string(slot):
     if slot is 0:
         return s.TIMESLOT1_ICON
     else:
