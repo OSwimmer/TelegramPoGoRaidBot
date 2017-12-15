@@ -5,7 +5,7 @@ from keyboard import get_keyboard
 import raid as r
 import static_data as s
 
-import logging, requests, time, threading, configparser
+import logging, requests, time, threading
 
 
 def get_chat_id(bot, update):
@@ -117,9 +117,7 @@ def pull_api():
 
 
 def main():
-    config = configparser.ConfigParser()
-    config.read("properties.ini")
-    updater = Updater(token=config["TelegramSettings"]["token"])
+    updater = Updater(token=s.get_token())
     dispatcher = updater.dispatcher
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)

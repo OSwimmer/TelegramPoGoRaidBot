@@ -1,3 +1,5 @@
+import configparser
+
 
 # button numbers
 
@@ -15,3 +17,19 @@ raid_bot_id = -201461051
 # icons
 TIMESLOT1_ICON = "1️⃣"
 TIMESLOT2_ICON = "2️⃣"
+
+
+config = configparser.ConfigParser()
+config.read("properties.ini")
+
+
+def get_token():
+    return config["TelegramSettings"]["token"]
+
+
+def get_moves_file():
+    return config["GameData"]["moves_file"]
+
+
+def get_pokemon_file():
+    return config["GameData"]["pokemon_file"]
