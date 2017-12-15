@@ -127,7 +127,7 @@ def main():
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     add_handlers(dispatcher)
-    updater.start_polling(timeout=20)
+    updater.start_polling(timeout=25)
     # pull_api()
     print("Bot started!")
 
