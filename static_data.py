@@ -37,3 +37,4 @@ def get_pokemon_file():
 
 moves = json.load(open(get_moves_file()))
 pokemon = json.load(open(get_pokemon_file()))
+region = config["PokeHuntAPI"]["region"]

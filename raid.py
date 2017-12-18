@@ -88,8 +88,14 @@ def get_moveset(raid_id):
 
 
 def get_moveset_names(moveset):
-    quick = s.moves[moveset[0]]
-    charged = s.moves[moveset[1]]
+    try:
+        quick = s.moves[moveset[0]]
+    except KeyError:
+        quick = "???"
+    try:
+        charged = s.moves[moveset[1]]
+    except KeyError:
+        charged = "???"
     return [quick, charged]
 
 
@@ -98,7 +104,11 @@ def get_boss(raid_id):
 
 
 def get_boss_name(boss_id):
-    return s.pokemon[boss_id]
+    try:
+        boss = s.pokemon[boss_id]
+    except KeyError:
+        boss = "???"
+    return boss
 
 
 def get_gym(raid_id):
@@ -145,7 +155,7 @@ def roundTime(obj=None, roundTo=60):
     return obj + dt.timedelta(0, rounding-seconds, -obj.microsecond)
 
 
-def toBold(string):
+def to_bold(string):
     return "*" + string + "*"
 
 
@@ -167,7 +177,7 @@ def get_gym_line(raid_id):
 def get_boss_line(raid_id):
     moveset = get_moveset(raid_id)
     boss = get_boss(raid_id)
-    result = "%s (%s / %s) Raid\n" % (toBold(boss), moveset[0], moveset[1])
+    result = "%s (%s / %s) Raid\n" % (to_bold(boss), moveset[0], moveset[1])
     return result
 
 
@@ -220,11 +230,11 @@ def get_players_as_string(raid_id):
 def get_can_start_message(diff, slot_icon):
     can_start = "\n%s " % slot_icon
     if diff <= 0:
-        can_start = can_start + toBold("Iedereen is aanwezig!")
+        can_start = can_start + to_bold("Iedereen is aanwezig!")
     elif diff == 1:
         can_start = can_start + "Er moet nog *één* iemand komen"
     else:
-        can_start = can_start + "Er moeten nog " + toBold(str(diff)) + " spelers komen"
+        can_start = can_start + "Er moeten nog " + to_bold(str(diff)) + " spelers komen"
     return can_start
 
 

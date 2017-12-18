@@ -5,7 +5,7 @@ from keyboard import get_keyboard
 import raid as r
 import static_data as s
 
-import logging, requests, time, threading
+import logging, requests, time, threading, random
 import datetime as dt
 
 
@@ -70,11 +70,11 @@ def remove_player_from_raid(user, message, raid_id):
 
 def add_test_raid(bot, update):
     r.init_raid()
-    r.set_boss(r.global_raid_id, "151")
+    r.set_boss(r.global_raid_id, str(random.randint(1, 387)))
     r.set_gym(r.global_raid_id, "TestGym")
     location = Location(4.456874, 50.878761)
     r.set_location(r.global_raid_id, location)
-    r.set_moveset(r.global_raid_id, ["1", "2"])
+    r.set_moveset(r.global_raid_id, [str(random.randint(1, 281)), str(random.randint(1, 281))])
     now_obj = dt.datetime.now()
     now = now_obj.strftime('%H:%M')
     r.set_opentime(r.global_raid_id, now)
