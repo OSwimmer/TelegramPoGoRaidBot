@@ -9,6 +9,9 @@ import logging, requests, time, threading, random
 import datetime as dt
 
 
+current_day = dt.datetime.now().date()
+
+
 def get_chat_id(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="chat id is " + str(update.message.chat_id))
 
@@ -69,6 +72,7 @@ def remove_player_from_raid(user, message, raid_id):
 
 
 def add_test_raid(bot, update):
+    print(str(r.global_raid_id))
     r.init_raid()
     r.set_boss(r.global_raid_id, str(random.randint(1, 387)))
     r.set_gym(r.global_raid_id, "TestGym")
@@ -117,8 +121,19 @@ def add_handlers(dispatcher):
 
 
 def pull_api():
+    global current_day
     print(time.ctime())
-    threading.Timer(60, pull_api).start()
+    now = dt.datetime.now()
+    sleeptime = 60
+    if s.START_TIME <= now.time() < s.END_TIME:
+        print("api pull")
+        sleeptime = 60
+    elif now.time() >= s.END_TIME + s.BUFFER_TIME:
+        print("reset raids")
+        r.reset_raids()
+        sleeptime = (dt.timedelta(hours=24) - (now - now.replace(hour=6, minute=30, second=0, microsecond=0))).total_seconds() % (24 * 3600)
+    print("sleeptime is " + str(sleeptime))
+    threading.Timer(sleeptime, pull_api).start()
 
 
 def main():

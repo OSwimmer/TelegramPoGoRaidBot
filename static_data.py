@@ -1,4 +1,8 @@
-import configparser, json
+import configparser, json, datetime
+
+
+config = configparser.ConfigParser()
+config.read("properties.ini")
 
 
 # button numbers
@@ -11,7 +15,7 @@ PLAYER_ARRIVED_BUTTON = "5"
 REMOVE_PLAYER_BUTTON = "6"
 
 # chat ids
-group_chat_id = -201461051
+group_chat_id = config["TelegramSettings"]["group_chat_id"]
 raid_bot_id = -201461051
 
 # icons
@@ -19,8 +23,10 @@ TIMESLOT1_ICON = "1️⃣"
 TIMESLOT2_ICON = "2️⃣"
 
 
-config = configparser.ConfigParser()
-config.read("properties.ini")
+# times
+START_TIME = datetime.time(hour=8)
+END_TIME = datetime.time(hour=21)
+BUFFER_TIME = datetime.timedelta(hours=1, minutes=45)
 
 
 def get_token():

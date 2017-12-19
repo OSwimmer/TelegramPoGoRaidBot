@@ -15,6 +15,13 @@ raids = [
 global_raid_id = 0
 
 
+def reset_raids():
+    global global_raid_id
+    raids.clear()
+    init_raid()
+    global_raid_id = 0
+
+
 def init_raid():
     raids.append({
         "boss": "",
