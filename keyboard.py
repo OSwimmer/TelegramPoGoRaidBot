@@ -10,3 +10,25 @@ def get_keyboard(raid_id):
                 [InlineKeyboardButton("➕👨 Extra speler", callback_data=s.ADD_PERSON_BUTTON + data), InlineKeyboardButton("➖👨 Verwijder speler", callback_data=s.REMOVE_PERSON_BUTTON + data)],
                 [InlineKeyboardButton("🆗 Aanwezig", callback_data=s.PLAYER_ARRIVED_BUTTON + data), InlineKeyboardButton("❌ Ik kom niet!", callback_data=s.REMOVE_PLAYER_BUTTON + data)]]
     return InlineKeyboardMarkup(keyboard)
+
+
+def get_bosses_keyboard():
+    bosses = s.get_current_raid_bosses()
+    length = len(bosses)
+    rows, remainder = divmod(length, s.MAX_COLUMN_WIDTH)
+    result = []
+    for row in range(rows):
+        start = row * s.MAX_COLUMN_WIDTH
+        result.append(bosses[start:start + s.MAX_COLUMN_WIDTH])
+    start = rows * s.MAX_COLUMN_WIDTH
+    result.append(bosses[start:start + remainder])
+    print(str(result))
+    return result
+
+
+def get_time_keyboard():
+    keyboard = [['7', '8', '9'],
+                ['4', '5', '6'],
+                ['1', '2', '3'],
+                ['0', ':', "➡"]]
+    return keyboard

@@ -16,6 +16,10 @@ def get_chat_id(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="chat id is " + str(update.message.chat_id))
 
 
+def get_user_id(bot, update):
+    bot.send_message(chat_id=update.message.chat_id, text="user id is " + str(update.message.from_user.id))
+
+
 def button(bot, update):
     query = update.callback_query
     message = query.message
@@ -26,6 +30,11 @@ def button(bot, update):
     data = format(query.data)
     new_message = message.text
     button_id, raid_id = extract_from_button(data)
+    if not r.is_raid_ongoing(raid_id):
+        print("raid ended")
+        bot.edit_message_reply_markup(chat_id=s.group_chat_id, message_id=message.message_id, text=message.text, reply_markup=None, parse_mode=ParseMode.MARKDOWN)
+        r.remove_raid(raid_id)
+        return
     if button_id is s.ADD_PLAYER_BUTTON_SLOT1:
         new_message = add_player_to_raid(username, message.text, raid_id, 0)
     elif button_id is s.ADD_PLAYER_BUTTON_SLOT2:
@@ -43,7 +52,7 @@ def button(bot, update):
 
 def extract_from_button(data):
     splitted = data.split(",")
-    return splitted[0], int(splitted[1])
+    return splitted[0], splitted[1]
 
 
 def player_has_arrived(user, message, raid_id):
@@ -72,7 +81,6 @@ def remove_player_from_raid(user, message, raid_id):
 
 
 def add_test_raid(bot, update):
-    print(str(r.global_raid_id))
     r.init_raid()
     r.set_boss(r.global_raid_id, str(random.randint(1, 387)))
     r.set_gym(r.global_raid_id, "TestGym")
@@ -88,7 +96,7 @@ def add_test_raid(bot, update):
     reply_markup = get_keyboard(r.global_raid_id)
     bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
     bot.send_message(chat_id=update.message.chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
-    r.global_raid_id += 1
+    r.increment_global_raid_id()
 
 
 def unknown(bot, update):
@@ -104,6 +112,8 @@ def add_handlers(dispatcher):
     dispatcher.add_handler(add_raid_handler)
     chat_id_handler = CommandHandler('chatid', get_chat_id)
     dispatcher.add_handler(chat_id_handler)
+    user_id_handler = CommandHandler('userid', get_user_id)
+    dispatcher.add_handler(user_id_handler)
 
     add_test_raid_handler = CommandHandler('testRaid', add_test_raid)
     dispatcher.add_handler(add_test_raid_handler)

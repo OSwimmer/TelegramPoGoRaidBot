@@ -1,29 +1,34 @@
 import static_data as s
 import datetime as dt
-import time
 
-raids = [
-    {
-        "boss": "",
-        "moveset": ["Quick", "Fast"],
-        "gym": "",
-        "location": "",
-        "opens": "",
-        "timeslots": [],
-        "players": {}
-    }]
-global_raid_id = 0
+# raids = [
+#     {
+#         "boss": "",
+#         "moveset": ["Quick", "Fast"],
+#         "gym": "",
+#         "location": "",
+#         "opens": "",
+#         "timeslots": [],
+#         "players": {}
+#     }]
+raids = {}
+global_raid_id = "0"
+
+
+def increment_global_raid_id():
+    global global_raid_id
+    global_raid_id = str(int(global_raid_id) + 1)
 
 
 def reset_raids():
     global global_raid_id
     raids.clear()
     init_raid()
-    global_raid_id = 0
+    global_raid_id = "0"
 
 
 def init_raid():
-    raids.append({
+    raids[global_raid_id] = {
         "boss": "",
         "moveset": ["Quick", "Fast"],
         "gym": "",
@@ -31,7 +36,11 @@ def init_raid():
         "opens": "",
         "timeslots": [],
         "players": {}
-    })
+    }
+
+
+def remove_raid(raid_id):
+    print(str(raids.pop(raid_id, None)))
 
 
 def add_player_to_raid(username, raid_id, timeslot):
@@ -62,8 +71,12 @@ def player_has_arrived(username, raid_id):
     raids[raid_id]["players"][username]["arrived"] = True
 
 
-def set_boss(raid_id, boss):
-    raids[raid_id]["boss"] = get_boss_name(boss)
+def set_boss(raid_id, boss_id):
+    raids[raid_id]["boss"] = get_boss_name(boss_id)
+
+
+def set_boss_by_name(raid_id, boss_name):
+    raids[raid_id]["boss"] = boss_name
 
 
 def set_gym(raid_id, gym):
@@ -118,6 +131,10 @@ def get_boss_name(boss_id):
     return boss
 
 
+def get_boss_id(boss_name):
+    return s.current_bosses[boss_name]
+
+
 def get_gym(raid_id):
     return raids[raid_id]["gym"]
 
@@ -140,13 +157,23 @@ def get_opentime_from_end(end):
     return end_obj - dt.timedelta(minutes=45)
 
 
+def calculate_end_time(start_obj):
+    end_obj = start_obj + s.RAID_DURATION
+    return end_obj
+
+
+def is_raid_ongoing(raid_id):
+    start = raids[raid_id]["opens"]
+    start_obj = dt.datetime.strptime(start, '%H:%M')
+    end_obj = calculate_end_time(start_obj)
+    return end_obj.time() > dt.datetime.now().time()
+
+
 def calculate_timeslots(start_obj):
     slot1 = start_obj + dt.timedelta(minutes=5)
     slot2 = start_obj + dt.timedelta(minutes=33)
     slot1 = roundTime(slot1, 60*5)
     slot2 = roundTime(slot2, 60*5)
-    print(str(slot1))
-    print(str(slot2))
     return slot1.strftime('%H:%M'), slot2.strftime('%H:%M')
 
 
