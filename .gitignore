@@ -5,3 +5,4 @@ __pycache__/*
 properties.ini
 build/*
 dist/*
+raids.json
