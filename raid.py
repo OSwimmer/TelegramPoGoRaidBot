@@ -30,7 +30,7 @@ def reset_raids():
 def init_raid():
     raids[global_raid_id] = {
         "boss": "",
-        "moveset": ["Quick", "Fast"],
+        "moveset": ["???", "???"],
         "gym": "",
         "location": "",
         "opens": "",
@@ -164,9 +164,20 @@ def calculate_end_time(start_obj):
 
 def is_raid_ongoing(raid_id):
     start = raids[raid_id]["opens"]
-    start_obj = dt.datetime.strptime(start, '%H:%M')
+    start_obj = parse_time_string(start)
     end_obj = calculate_end_time(start_obj)
     return end_obj.time() > dt.datetime.now().time()
+
+
+def parse_time_string(time):
+    try:
+        result = dt.datetime.strptime(time, '%H:%M')
+    except ValueError:
+        try:
+            result = dt.datetime.strptime(time, '%H:%M:%S')
+        except ValueError:
+            result = None
+    return result
 
 
 def calculate_timeslots(start_obj):

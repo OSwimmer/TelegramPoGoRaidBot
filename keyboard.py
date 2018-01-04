@@ -22,7 +22,6 @@ def get_bosses_keyboard():
         result.append(bosses[start:start + s.MAX_COLUMN_WIDTH])
     start = rows * s.MAX_COLUMN_WIDTH
     result.append(bosses[start:start + remainder])
-    print(str(result))
     return result
 
 

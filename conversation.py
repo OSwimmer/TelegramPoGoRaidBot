@@ -64,12 +64,10 @@ def location(bot, update):
 def opens(bot, update):
     user = update.message.from_user
     message = update.message
-    print(str(message.text))
-    try:
-        time_obj = dt.datetime.strptime(update.message.text, '%H:%M')
-        time_str = time_obj.strftime('%H:%M')
-    except ValueError:
-        bot.send_message(chat_id=update.message.chat_id, text="Dat is geen correct formaat, gebruik dit aub: HH:mm.")
+    time_str = message.text
+    time_obj = r.parse_time_string(time_str)
+    if time_obj is None:
+        bot.send_message(chat_id=update.message.chat_id, text="Dat is geen correct formaat, gebruik dit aub: HH:mm(:ss).")
         return OPENS
     r.set_opentime(r.global_raid_id, time_str)
     slot1, slot2 = r.calculate_timeslots(time_obj)
