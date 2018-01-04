@@ -54,7 +54,7 @@ def gym(bot, update):
 def location(bot, update):
     user = update.message.from_user
     user_location = update.message.location
-    r.set_location(r.global_raid_id, user_location)
+    r.set_location_with_object(r.global_raid_id, user_location)
     logger.info("Location of the raid %s: %f / %f", user.first_name, user_location.latitude,
                 user_location.longitude)
     update.message.reply_text('Super, wanneer start de raid en gebruik het volgende formaat: hh:mm(:ss).')
@@ -75,16 +75,17 @@ def opens(bot, update):
     logger.info("Open time %s: %s", user.first_name, time_str)
     update.message.reply_text('Bedankt! Dus om samen te vatten:\n' +
                               r.get_raid_info_as_string(r.global_raid_id), parse_mode=ParseMode.MARKDOWN)
-    bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
+    bot.send_location(chat_id=update.message.chat_id, location=r.get_location_as_object(r.global_raid_id))
     post_in_group(bot)
     r.increment_global_raid_id()
+    r.save_raids_to_file()
 
     return ConversationHandler.END
 
 
 def post_in_group(bot):
     reply_markup = get_keyboard(r.global_raid_id)
-    bot.send_location(chat_id=s.group_chat_id, location=r.get_location(r.global_raid_id))
+    bot.send_location(chat_id=s.group_chat_id, location=r.get_location_as_object(r.global_raid_id))
     bot.send_message(chat_id=s.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
 
 

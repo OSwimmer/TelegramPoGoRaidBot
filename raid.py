@@ -1,5 +1,9 @@
 import static_data as s
 import datetime as dt
+import json
+import collections
+
+from telegram import Location
 
 # raids = [
 #     {
@@ -11,7 +15,7 @@ import datetime as dt
 #         "timeslots": [],
 #         "players": {}
 #     }]
-raids = {}
+raids = collections.OrderedDict()
 global_raid_id = "0"
 
 
@@ -32,7 +36,7 @@ def init_raid():
         "boss": "",
         "moveset": ["???", "???"],
         "gym": "",
-        "location": "",
+        "location": {},
         "opens": "",
         "timeslots": [],
         "players": {}
@@ -41,6 +45,30 @@ def init_raid():
 
 def remove_raid(raid_id):
     print(str(raids.pop(raid_id, None)))
+
+
+def save_raids_to_file():
+    try:
+        with open(s.get_raid_backup_file(), 'w') as file:
+            out = {}
+            out["global_raid_id"] = global_raid_id
+            out["raids"] = raids
+            json.dump(out, file, indent=2)
+    except OSError:
+        return False
+    return True
+
+
+def load_raids_from_file():
+    global raids
+    global global_raid_id
+    try:
+        from_file = json.load(open(s.get_raid_backup_file()))
+        global_raid_id = from_file["global_raid_id"]
+        raids = from_file["raids"]
+    except OSError:
+        return False
+    return True
 
 
 def add_player_to_raid(username, raid_id, timeslot):
@@ -83,7 +111,12 @@ def set_gym(raid_id, gym):
     raids[raid_id]["gym"] = gym
 
 
-def set_location(raid_id, location):
+def set_location_with_object(raid_id, location):
+    raids[raid_id]["location"]["longitude"] = location["longitude"]
+    raids[raid_id]["location"]["latitude"] = location["latitude"]
+
+
+def set_location_with_dict(raid_id, location):
     raids[raid_id]["location"] = location
 
 
@@ -139,13 +172,16 @@ def get_gym(raid_id):
     return raids[raid_id]["gym"]
 
 
-def get_location(raid_id):
+def get_location_as_string(raid_id):
+    return raids[raid_id]["location"]["longitude"] + ", " + raids[raid_id]["location"]["latitude"]
+
+
+def get_location_as_dict(raid_id):
     return raids[raid_id]["location"]
 
 
-def get_location_as_string(raid_id):
-    loc = get_location(raid_id)
-    return str(loc.latitude) + " / " + str(loc.longitude)
+def get_location_as_object(raid_id):
+    return Location(raids[raid_id]["location"]["longitude"], raids[raid_id]["location"]["latitude"])
 
 
 def get_opentime(raid_id):

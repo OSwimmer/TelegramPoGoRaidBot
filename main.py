@@ -47,6 +47,7 @@ def button(bot, update):
         new_message = player_has_arrived(username, message.text, raid_id)
     elif button_id is s.REMOVE_PLAYER_BUTTON:
         new_message = remove_player_from_raid(username, message.text, raid_id)
+    r.save_raids_to_file()
     bot.edit_message_text(chat_id=s.group_chat_id, message_id=message.message_id, text=new_message, reply_markup=get_keyboard(raid_id), parse_mode=ParseMode.MARKDOWN)
 
 
@@ -85,7 +86,7 @@ def add_test_raid(bot, update):
     r.set_boss(r.global_raid_id, str(random.randint(1, 387)))
     r.set_gym(r.global_raid_id, "TestGym")
     location = Location(4.456874, 50.878761)
-    r.set_location(r.global_raid_id, location)
+    r.set_location_with_object(r.global_raid_id, location)
     r.set_moveset(r.global_raid_id, [str(random.randint(1, 281)), str(random.randint(1, 281))])
     now_obj = dt.datetime.now()
     now = now_obj.strftime('%H:%M:%S')
@@ -94,7 +95,7 @@ def add_test_raid(bot, update):
     r.set_timeslots(r.global_raid_id, [slot1, slot2])
 
     reply_markup = get_keyboard(r.global_raid_id)
-    bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
+    bot.send_location(chat_id=update.message.chat_id, location=r.get_location_as_object(r.global_raid_id))
     bot.send_message(chat_id=update.message.chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
     r.increment_global_raid_id()
 
@@ -107,6 +108,13 @@ def silence(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Ssshh %s, you are beautiful when you don't talk" % update.message.from_user.username)
 
 
+def load_state_from_file(bot, update):
+    if r.load_raids_from_file():
+        bot.send_message(chat_id=update.message.chat_id, text="Raids zijn succesvol ingeladen!")
+    else:
+        bot.send_message(chat_id=update.message.chat_id, text="Er was een probleem bij het inladen van de raids, check of de config correct is.")
+
+
 def add_handlers(dispatcher):
     add_raid_handler = get_add_raid_handler()
     dispatcher.add_handler(add_raid_handler)
@@ -115,7 +123,7 @@ def add_handlers(dispatcher):
     user_id_handler = CommandHandler('userid', get_user_id)
     dispatcher.add_handler(user_id_handler)
 
-    add_test_raid_handler = CommandHandler('testRaid', add_test_raid)
+    add_test_raid_handler = CommandHandler('testRaid', add_test_raid, filters=Filters.user(s.get_admins()))
     dispatcher.add_handler(add_test_raid_handler)
 
     # dispatcher.add_handler(rb.get_raid_bot_handler())
@@ -123,11 +131,14 @@ def add_handlers(dispatcher):
     callback_handler = CallbackQueryHandler(button)
     dispatcher.add_handler(callback_handler)
 
+    recover_handler = CommandHandler('recover', load_state_from_file, filters=Filters.user(s.get_admins()))
+    dispatcher.add_handler(recover_handler)
+
     unknown_handler = MessageHandler(Filters.command, unknown)
     dispatcher.add_handler(unknown_handler)
-
-    lulz_handler = MessageHandler(Filters.text, silence)
-    dispatcher.add_handler(lulz_handler)
+    if s.LULZ:
+        lulz_handler = MessageHandler(Filters.text, silence)
+        dispatcher.add_handler(lulz_handler)
 
 
 def pull_api():

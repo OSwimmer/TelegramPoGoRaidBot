@@ -30,6 +30,8 @@ END_TIME = datetime.time(hour=21)
 BUFFER_TIME = datetime.timedelta(hours=1, minutes=45)
 RAID_DURATION = datetime.timedelta(minutes=int(config["GameData"]["raid_duration"]))
 
+# LULZ??
+LULZ = False
 
 def get_token():
     return config["TelegramSettings"]["token"]
@@ -68,3 +70,7 @@ def make_current_bosses_dict():
 
 
 current_bosses = make_current_bosses_dict()
+
+
+def get_raid_backup_file():
+    return config["GameData"]["raid_backup_file"]
