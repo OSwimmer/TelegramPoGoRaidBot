@@ -6,3 +6,5 @@ properties.ini
 build/*
 dist/*
 raids.json
+*.spec
+*.zip
