@@ -23,9 +23,9 @@ def start(bot, update):
     r.init_raid()
 
     update.message.reply_text(
-        'Hi! I will help you to add a raid. '
-        'Send /cancel to stop talking to me.\n\n'
-        'What raid is starting?',
+        'Hallo! Ik zal je helpen om een raid toe te voegen. '
+        'Stuur /cancel op elk moment om te stoppen.\n\n'
+        'Welke raid gaat starten?',
         reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
     return BOSS
@@ -36,7 +36,7 @@ def boss(bot, update):
     bossname = update.message.text
     r.set_boss_by_name(r.global_raid_id, bossname)
     logger.info("Boss selected by %s: %s", user.first_name, bossname)
-    update.message.reply_text('Now send me the name of the gym please.',
+    update.message.reply_text('Wat is de naam van de gym?',
                               reply_markup=ReplyKeyboardRemove())
     return GYM
 
@@ -46,7 +46,7 @@ def gym(bot, update):
     gymname = update.message.text
     r.set_gym(r.global_raid_id, gymname)
     logger.info("Gym selected by user %s: %s", user.first_name, gymname)
-    update.message.reply_text('Episch! Now, send me the location please')
+    update.message.reply_text('Episch! Stuur me de locatie van de raid aub.')
 
     return LOCATION
 
@@ -57,7 +57,7 @@ def location(bot, update):
     r.set_location(r.global_raid_id, user_location)
     logger.info("Location of the raid %s: %f / %f", user.first_name, user_location.latitude,
                 user_location.longitude)
-    update.message.reply_text('Super, now tell me when it opens, with the following format: HH:mm.')
+    update.message.reply_text('Super, wanneer start de raid en gebruik het volgende formaat: hh:mm(:ss).')
     return OPENS
 
 
@@ -69,13 +69,13 @@ def opens(bot, update):
         time_obj = dt.datetime.strptime(update.message.text, '%H:%M')
         time_str = time_obj.strftime('%H:%M')
     except ValueError:
-        bot.send_message(chat_id=update.message.chat_id, text="That is not a valid time format, please use HH:mm.")
+        bot.send_message(chat_id=update.message.chat_id, text="Dat is geen correct formaat, gebruik dit aub: HH:mm.")
         return OPENS
     r.set_opentime(r.global_raid_id, time_str)
     slot1, slot2 = r.calculate_timeslots(time_obj)
     r.set_timeslots(r.global_raid_id, [slot1, slot2])
     logger.info("Open time %s: %s", user.first_name, time_str)
-    update.message.reply_text('Thank you! So to summarize:\n' +
+    update.message.reply_text('Bedankt! Dus om samen te vatten:\n' +
                               r.get_raid_info_as_string(r.global_raid_id), parse_mode=ParseMode.MARKDOWN)
     bot.send_location(chat_id=update.message.chat_id, location=r.get_location(r.global_raid_id))
     post_in_group(bot)
@@ -93,9 +93,8 @@ def post_in_group(bot):
 def cancel(bot, update):
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text('Bye! I hope we can talk again some day.',
+    update.message.reply_text('Toevoegen van een raid is geannuleerd!',
                               reply_markup=ReplyKeyboardRemove())
-
     return ConversationHandler.END
 
 

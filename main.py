@@ -88,7 +88,7 @@ def add_test_raid(bot, update):
     r.set_location(r.global_raid_id, location)
     r.set_moveset(r.global_raid_id, [str(random.randint(1, 281)), str(random.randint(1, 281))])
     now_obj = dt.datetime.now()
-    now = now_obj.strftime('%H:%M')
+    now = now_obj.strftime('%H:%M:%S')
     r.set_opentime(r.global_raid_id, now)
     slot1, slot2 = r.calculate_timeslots(now_obj)
     r.set_timeslots(r.global_raid_id, [slot1, slot2])
