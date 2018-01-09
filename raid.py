@@ -44,7 +44,7 @@ def init_raid():
 
 
 def remove_raid(raid_id):
-    print(str(raids.pop(raid_id, None)))
+    print("removed raid:\n" + str(raids.pop(raid_id, None)))
 
 
 def save_raids_to_file():
@@ -199,7 +199,10 @@ def calculate_end_time(start_obj):
 
 
 def is_raid_ongoing(raid_id):
-    start = raids[raid_id]["opens"]
+    try:
+        start = raids[raid_id]["opens"]
+    except KeyError:
+        return False
     start_obj = parse_time_string(start)
     end_obj = calculate_end_time(start_obj)
     return end_obj.time() > dt.datetime.now().time()
@@ -258,7 +261,10 @@ def get_gym_line(raid_id):
 def get_boss_line(raid_id):
     moveset = get_moveset(raid_id)
     boss = get_boss(raid_id)
-    result = "%s (%s / %s) Raid\n" % (to_bold(boss), moveset[0], moveset[1])
+    if moveset[0] == "???" and moveset[1] == "???":
+        result = "%s Raid\n" % (to_bold(boss))
+    else:
+        result = "%s (%s / %s) Raid\n" % (to_bold(boss), moveset[0], moveset[1])
     return result
 
 
@@ -274,7 +280,10 @@ def timeslot_to_icon_string(slot):
 
 
 def slots_to_string(slots, slot1, slot2):
-    return "  Moment %s %s:\n%s\n  Moment %s %s:\n%s" % (s.TIMESLOT1_ICON, slots[0], slot1, s.TIMESLOT2_ICON, slots[1], slot2)
+    slot2_string = ""
+    if slot2 is not None:
+        slot2_string = "\n  Moment %s %s:\n%s" % (s.TIMESLOT2_ICON, slots[1], slot2)
+    return "  Moment %s %s:\n%s%s" % (s.TIMESLOT1_ICON, slots[0], slot1, slot2_string)
 
 
 def get_players_as_string(raid_id):
@@ -304,12 +313,18 @@ def get_players_as_string(raid_id):
         else:
             slot2 = slot2 + line
     slots = get_timeslots(raid_id)
+    diff2 = players_coming[1] - players_arrived[1]
+    if slots[1] is None:
+        slot2 = None
+        diff2 = None
     result = result + slots_to_string(slots, slot1, slot2)
-    return result, players_coming[0] - players_arrived[0], players_coming[1] - players_arrived[1]
+    return result, players_coming[0] - players_arrived[0], diff2
 
 
 def get_can_start_message(diff, slot_icon):
     can_start = "\n%s " % slot_icon
+    if diff is None:
+        return ""
     if diff <= 0:
         can_start = can_start + to_bold("Iedereen is aanwezig!")
     elif diff == 1:

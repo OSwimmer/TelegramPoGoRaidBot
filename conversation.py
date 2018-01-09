@@ -14,7 +14,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-BOSS, GYM, LOCATION, OPENS = range(4)
+BOSS, GYM, LOCATION, OPENS, SLOT = range(5)
 
 
 def start(bot, update):
@@ -57,7 +57,7 @@ def location(bot, update):
     r.set_location_with_object(r.global_raid_id, user_location)
     logger.info("Location of the raid %s: %f / %f", user.first_name, user_location.latitude,
                 user_location.longitude)
-    update.message.reply_text('Super, wanneer start de raid en gebruik het volgende formaat: hh:mm(:ss).')
+    update.message.reply_text('Super, wanneer opent de raid en gebruik het volgende formaat: hh:mm(:ss).')
     return OPENS
 
 
@@ -70,17 +70,36 @@ def opens(bot, update):
         bot.send_message(chat_id=update.message.chat_id, text="Dat is geen correct formaat, gebruik dit aub: HH:mm(:ss).")
         return OPENS
     r.set_opentime(r.global_raid_id, time_str)
-    slot1, slot2 = r.calculate_timeslots(time_obj)
-    r.set_timeslots(r.global_raid_id, [slot1, slot2])
+    # slot1, slot2 = r.calculate_timeslots(time_obj)
+    # r.set_timeslots(r.global_raid_id, [slot1, slot2])
     logger.info("Open time %s: %s", user.first_name, time_str)
+    update.message.reply_text("Geef nu het moment wanneer jullie willen starten met de raid. Gebruik het volgende formaat: hh:mm.")
+
+    return SLOT
+
+
+def slot(bot, update):
+    user = update.message.from_user
+    message = update.message
+    time_str = message.text
+    time_obj = r.parse_time_string(time_str)
+    if time_obj is None:
+        bot.send_message(chat_id=update.message.chat_id,
+                         text="Dat is geen correct formaat, gebruik dit aub: HH:mm.")
+        return SLOT
+    r.set_timeslots(r.global_raid_id, [time_str, None])
+    logger.info("Timeslot %s: %s", user, time_str)
+    finalize_add(bot, update)
+    return ConversationHandler.END
+
+
+def finalize_add(bot, update):
     update.message.reply_text('Bedankt! Dus om samen te vatten:\n' +
                               r.get_raid_info_as_string(r.global_raid_id), parse_mode=ParseMode.MARKDOWN)
     bot.send_location(chat_id=update.message.chat_id, location=r.get_location_as_object(r.global_raid_id))
     post_in_group(bot)
-    r.increment_global_raid_id()
     r.save_raids_to_file()
-
-    return ConversationHandler.END
+    r.increment_global_raid_id()
 
 
 def post_in_group(bot):
@@ -114,7 +133,9 @@ def get_add_raid_handler():
 
             LOCATION: [MessageHandler(Filters.location, location)],
 
-            OPENS: [MessageHandler(Filters.text, opens)]
+            OPENS: [MessageHandler(Filters.text, opens)],
+
+            SLOT: [MessageHandler(Filters.text, slot)]
         },
 
         fallbacks=[CommandHandler('cancel', cancel)]
