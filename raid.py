@@ -5,16 +5,6 @@ import collections
 
 from telegram import Location
 
-# raids = [
-#     {
-#         "boss": "",
-#         "moveset": ["Quick", "Fast"],
-#         "gym": "",
-#         "location": "",
-#         "opens": "",
-#         "timeslots": [],
-#         "players": {}
-#     }]
 raids = collections.OrderedDict()
 global_raid_id = "0"
 

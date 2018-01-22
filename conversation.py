@@ -33,7 +33,7 @@ def boss(bot, update):
     user = update.message.from_user
     bossname = update.message.text
     r.set_boss_by_name(r.global_raid_id, bossname)
-    logger.info("Boss selected by %s: %s", user.first_name, bossname)
+    logger.info("Boss selected by %s: %s", user.username, bossname)
     update.message.reply_text('Wat is de naam van de gym?',
                               reply_markup=ReplyKeyboardRemove())
     return GYM
@@ -43,7 +43,7 @@ def gym(bot, update):
     user = update.message.from_user
     gymname = update.message.text
     r.set_gym(r.global_raid_id, gymname)
-    logger.info("Gym selected by user %s: %s", user.first_name, gymname)
+    logger.info("Gym selected by user %s: %s", user.username, gymname)
     update.message.reply_text('Episch! Stuur me de locatie van de raid aub.')
 
     return LOCATION
@@ -53,7 +53,7 @@ def location(bot, update):
     user = update.message.from_user
     user_location = update.message.location
     r.set_location_with_object(r.global_raid_id, user_location)
-    logger.info("Location of the raid %s: %f / %f", user.first_name, user_location.latitude,
+    logger.info("Location of the raid %s: %f / %f", user.username, user_location.latitude,
                 user_location.longitude)
     update.message.reply_text('Super, wanneer opent de raid en gebruik het volgende formaat: hh:mm(:ss).')
     return OPENS
@@ -68,9 +68,7 @@ def opens(bot, update):
         bot.send_message(chat_id=update.message.chat_id, text="Dat is geen correct formaat, gebruik dit aub: HH:mm(:ss).")
         return OPENS
     r.set_opentime(r.global_raid_id, time_str)
-    # slot1, slot2 = r.calculate_timeslots(time_obj)
-    # r.set_timeslots(r.global_raid_id, [slot1, slot2])
-    logger.info("Open time %s: %s", user.first_name, time_str)
+    logger.info("Open time %s: %s", user.username, time_str)
     update.message.reply_text("Geef nu het moment wanneer jullie willen starten met de raid. Gebruik het volgende formaat: hh:mm.")
 
     return SLOT
@@ -86,7 +84,7 @@ def slot(bot, update):
                          text="Dat is geen correct formaat, gebruik dit aub: HH:mm.")
         return SLOT
     r.set_timeslots(r.global_raid_id, [time_str, None])
-    logger.info("Timeslot %s: %s", user, time_str)
+    logger.info("Timeslot %s: %s", user.username, time_str)
     finalize_add(bot, update)
     return ConversationHandler.END
 
@@ -108,7 +106,7 @@ def post_in_group(bot):
 
 def cancel(bot, update):
     user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
+    logger.info("User %s canceled the conversation.", user.username)
     update.message.reply_text('Toevoegen van een raid is geannuleerd!',
                               reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
