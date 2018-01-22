@@ -83,8 +83,31 @@ def get_request_method():
     return config["TelegramSettings"]["request_method"].lower()
 
 
-def get_get_webhook_parameters():
-    result = {"listen": config["TelegramSettings"]["listen"], "port": config["TelegramSettings"]["port"],
-              "url_path": config["TelegramSettings"]["url_path"], "cert": config["TelegramSettings"]["cert"],
-              "key": config["TelegramSettings"]["key"], "webhook_url": config["TelegramSettings"]["webhook_url"]}
+def get_webhook_parameters():
+    result = {}
+    try:
+        result["listen"] = config["TelegramSettings"]["listen"]
+    except KeyError:
+        result["listen"] = '127.0.0.1'
+    try:
+        result["port"] = config["TelegramSettings"]["port"]
+    except KeyError:
+        result["port"] = 80
+    try:
+        result["url_path"] = config["TelegramSettings"]["url_path"]
+    except KeyError:
+        result["url_path"] = ''
+    try:
+        result["cert"] = config["TelegramSettings"]["cert"]
+    except KeyError:
+        result["cert"] = None
+    try:
+        result["key"] = config["TelegramSettings"]["key"]
+    except KeyError:
+        result["key"] = None
+    try:
+        result["webhook_url"] = config["TelegramSettings"]["webhook_url"]
+    except KeyError:
+        result["webhook_url"] = None
+    print(str(result))
     return result

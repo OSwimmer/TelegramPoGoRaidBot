@@ -1,4 +1,4 @@
-from telegram.ext import MessageHandler, Filters, CommandHandler, Updater, InlineQueryHandler, CallbackQueryHandler
+from telegram.ext import MessageHandler, Filters, CommandHandler, Updater, CallbackQueryHandler
 from telegram import ParseMode, Location
 from conversation import get_add_raid_handler
 from keyboard import get_keyboard
@@ -163,13 +163,14 @@ def main():
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     add_handlers(dispatcher)
-    if s.get_request_method() is "polling":
+    if s.get_request_method() == "polling":
         updater.start_polling(timeout=25)
+        print("Bot started polling!")
     else:
-        wh = s.get_get_webhook_parameters()
+        wh = s.get_webhook_parameters()
         updater.start_webhook(listen=wh["listen"], port=wh["port"], url_path=wh["url_path"], webhook_url=["webhook_url"], cert=wh["cert"], key=wh["key"])
+        print("Bot started webhook!")
     # pull_api()
-    print("Bot started!")
 
 
 if __name__ == '__main__':
