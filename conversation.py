@@ -1,12 +1,10 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton, ParseMode)
-from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode)
+from telegram.ext import (CommandHandler, MessageHandler, Filters, RegexHandler,
                           ConversationHandler)
-import time
-import datetime as dt
 import logging
 import raid as r
 import static_data as s
-from keyboard import get_keyboard, get_bosses_keyboard, get_time_keyboard
+from keyboard import get_keyboard, get_bosses_keyboard
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

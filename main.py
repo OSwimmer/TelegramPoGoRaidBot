@@ -5,7 +5,7 @@ from keyboard import get_keyboard
 import raid as r
 import static_data as s
 
-import logging, requests, time, threading, random
+import logging, time, threading, random
 import datetime as dt
 
 
@@ -125,8 +125,6 @@ def add_handlers(dispatcher):
 
     add_test_raid_handler = CommandHandler('testRaid', add_test_raid, filters=Filters.user(s.get_admins()))
     dispatcher.add_handler(add_test_raid_handler)
-
-    # dispatcher.add_handler(rb.get_raid_bot_handler())
 
     callback_handler = CallbackQueryHandler(button)
     dispatcher.add_handler(callback_handler)

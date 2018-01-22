@@ -27,11 +27,3 @@ def get_bosses_keyboard():
     start = rows * s.MAX_COLUMN_WIDTH
     result.append(bosses[start:start + remainder])
     return result
-
-
-def get_time_keyboard():
-    keyboard = [['7', '8', '9'],
-                ['4', '5', '6'],
-                ['1', '2', '3'],
-                ['0', ':', "➡"]]
-    return keyboard
