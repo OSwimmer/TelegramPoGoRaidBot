@@ -33,6 +33,7 @@ RAID_DURATION = datetime.timedelta(minutes=int(config["GameData"]["raid_duration
 # LULZ??
 LULZ = False
 
+
 def get_token():
     return config["TelegramSettings"]["token"]
 
@@ -57,7 +58,9 @@ def get_admins():
 
 
 def get_current_raid_bosses():
-    return config["GameData"]["current_raid_bosses"].split(", ")
+    bosses = config["GameData"]["current_raid_bosses"].split(", ")
+    bosses = [x.capitalize() for x in bosses]
+    return bosses
 
 
 def make_current_bosses_dict():
@@ -74,3 +77,14 @@ current_bosses = make_current_bosses_dict()
 
 def get_raid_backup_file():
     return config["GameData"]["raid_backup_file"]
+
+
+def get_request_method():
+    return config["TelegramSettings"]["request_method"].lower()
+
+
+def get_get_webhook_parameters():
+    result = {"listen": config["TelegramSettings"]["listen"], "port": config["TelegramSettings"]["port"],
+              "url_path": config["TelegramSettings"]["url_path"], "cert": config["TelegramSettings"]["cert"],
+              "key": config["TelegramSettings"]["key"], "webhook_url": config["TelegramSettings"]["webhook_url"]}
+    return result

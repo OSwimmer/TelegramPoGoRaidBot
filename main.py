@@ -163,7 +163,11 @@ def main():
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     add_handlers(dispatcher)
-    updater.start_polling(timeout=25)
+    if s.get_request_method() is "polling":
+        updater.start_polling(timeout=25)
+    else:
+        wh = s.get_get_webhook_parameters()
+        updater.start_webhook(listen=wh["listen"], port=wh["port"], url_path=wh["url_path"], webhook_url=["webhook_url"], cert=wh["cert"], key=wh["key"])
     # pull_api()
     print("Bot started!")
 
