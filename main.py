@@ -48,7 +48,7 @@ def button(bot, update):
     elif button_id is s.REMOVE_PLAYER_BUTTON:
         new_message = remove_player_from_raid(username, message.text, raid_id)
     r.save_raids_to_file()
-    bot.edit_message_text(chat_id=s.group_chat_id, message_id=message.message_id, text=new_message, reply_markup=get_keyboard(raid_id), parse_mode=ParseMode.MARKDOWN)
+    bot.edit_message_text(chat_id=s.group_chat_id, message_id=message.message_id, text=new_message, reply_markup=get_keyboard(raid_id), parse_mode=ParseMode.MARKDOWN, timeout=15)
 
 
 def extract_from_button(data):
@@ -95,8 +95,8 @@ def add_test_raid(bot, update):
     r.set_timeslots(r.global_raid_id, [slot1, slot2])
 
     reply_markup = get_keyboard(r.global_raid_id)
-    bot.send_location(chat_id=update.message.chat_id, location=r.get_location_as_object(r.global_raid_id))
-    bot.send_message(chat_id=update.message.chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
+    bot.send_location(chat_id=s.group_chat_id, location=r.get_location_as_object(r.global_raid_id))
+    bot.send_message(chat_id=s.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
     r.increment_global_raid_id()
 
 
