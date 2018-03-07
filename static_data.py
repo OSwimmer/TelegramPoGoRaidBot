@@ -18,7 +18,6 @@ MAX_COLUMN_WIDTH = 4
 
 # chat ids
 group_chat_id = config["TelegramSettings"]["group_chat_id"]
-# raid_bot_id = -201461051
 
 # icons
 TIMESLOT1_ICON = "1️⃣"
