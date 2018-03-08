@@ -20,6 +20,7 @@ The bot will send all the raid messages to this chat.
 * _/addRaid_ : starts the sequence to add a raid, follow the instructions given. Only for admins
 * _/testRaid_ : adds a completely randomized raid to the current chat (for testing purposes). Only for admins
 * _/recover_ :  loads the data from the backup file. THIS WILL REMOVE ANY RAIDS ALREADY PRESENT! Only for admins
+* _/makeAdmin X_ : makes the user with username X an admin for the bot if the user X accepts the message. Only for admins
 
 # Running the bot
 
