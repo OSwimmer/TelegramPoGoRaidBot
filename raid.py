@@ -263,7 +263,7 @@ def get_raid_info_with_loc_as_string(raid_id):
 
 
 def timeslot_to_icon_string(slot):
-    if slot is 0:
+    if slot == 0:
         return s.TIMESLOT1_ICON
     else:
         return s.TIMESLOT2_ICON
@@ -285,7 +285,7 @@ def get_players_as_string(raid_id):
     for player in raids[raid_id]["players"]:
         coming = raids[raid_id]["players"][player]['coming']
         slot = raids[raid_id]["players"][player]["timeslot"]
-        if coming is True:
+        if coming:
             line = "   %s %s" % ("└", player)
             players_coming[slot] += 1
         else:
@@ -294,11 +294,11 @@ def get_players_as_string(raid_id):
         if persons > 0:
             line = line + " +" + str(persons)
         arrived = raids[raid_id]["players"][player]['arrived']
-        if arrived is True and coming is True:
+        if arrived and coming:
             line = line + "  🆗"
             players_arrived[slot] += 1
         line = line + "\n"
-        if slot is 0:
+        if slot == 0:
             slot1 = slot1 + line
         else:
             slot2 = slot2 + line

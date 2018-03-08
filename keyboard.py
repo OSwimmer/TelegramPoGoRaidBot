@@ -27,3 +27,8 @@ def get_bosses_keyboard():
     start = rows * s.MAX_COLUMN_WIDTH
     result.append(bosses[start:start + remainder])
     return result
+
+
+def get_admin_confirmation_keyboard(username):
+    keyboard = [[InlineKeyboardButton("Ja", callback_data="accept"+username), InlineKeyboardButton("Nee", callback_data="deny"+username)]]
+    return InlineKeyboardMarkup(keyboard)

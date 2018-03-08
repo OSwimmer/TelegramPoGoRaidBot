@@ -33,6 +33,16 @@ RAID_DURATION = datetime.timedelta(minutes=int(config["GameData"]["raid_duration
 LULZ = False
 
 
+def reload_config():
+    config.read("properties.ini")
+
+
+def dump_and_reload_config(section, field, value):
+    config.set(section, field, value)
+    with open("properties.ini", "w+") as configfile:
+        config.write(configfile)
+
+
 def get_token():
     return config["TelegramSettings"]["token"]
 

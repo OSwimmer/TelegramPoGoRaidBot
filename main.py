@@ -1,7 +1,7 @@
 from telegram.ext import MessageHandler, Filters, CommandHandler, Updater, CallbackQueryHandler
 from telegram import ParseMode, Location
 from conversation import get_add_raid_handler
-from keyboard import get_keyboard
+from keyboard import get_keyboard, get_admin_confirmation_keyboard
 import raid as r
 import static_data as s
 
@@ -20,7 +20,42 @@ def get_user_id(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="user id is " + str(update.message.from_user.id))
 
 
+def make_admin(bot, update, args):
+    username = args[0]
+    if not username.startswith("@"):
+        username = "@" + username
+    bot.send_message(chat_id=update.message.chat_id, text=username + ", wil jij admin worden? Beantwoord dit bericht met onderstaande knoppen", reply_markup=get_admin_confirmation_keyboard(username))
+
+
 def button(bot, update):
+    query = format(update.callback_query.data)
+    if query.startswith("accept") or query.startswith("deny"):
+        admin_button(bot, update)
+    else:
+        raid_button(bot, update)
+
+
+def admin_button(bot, update):
+    query = update.callback_query
+    data = format(query.data)
+    reply, username = extract_from_button(data, "@")
+    message = query.message
+    from_user_name = query.from_user.username
+    from_user_id = query.from_user.id
+    if from_user_name == username:
+        if from_user_id in s.get_admins():
+            bot.edit_message_text(chat_id=message.chat_id, message_id=message.message_id, text="Je bent al een admin " + username + "!", reply_markup=None)
+            return
+        if reply == "deny":
+            bot.edit_message_text(chat_id=message.chat_id, message_id=message.message_id, text="Ok @" + username + ", je wordt geen admin!", reply_markup=None)
+        else:
+            bot.edit_message_text(chat_id=message.chat_id, message_id=message.message_id, text="Ok @" + username + ", je bent nu een admin!", reply_markup=None)
+            admins = s.get_admins()
+            admins.append(from_user_id)
+            s.dump_and_reload_config("TelegramSettings", "admins", ", ".join(map(str, admins)))
+
+
+def raid_button(bot, update):
     query = update.callback_query
     message = query.message
     user = query.from_user
@@ -29,30 +64,30 @@ def button(bot, update):
         username = user.first_name
     data = format(query.data)
     new_message = message.text
-    button_id, raid_id = extract_from_button(data)
+    button_id, raid_id = extract_from_button(data, ",")
     if not r.is_raid_ongoing(raid_id):
         print("raid ended")
         bot.edit_message_reply_markup(chat_id=s.group_chat_id, message_id=message.message_id, text=message.text, reply_markup=None, parse_mode=ParseMode.MARKDOWN)
         r.remove_raid(raid_id)
         return
-    if button_id is s.ADD_PLAYER_BUTTON_SLOT1:
+    if button_id == s.ADD_PLAYER_BUTTON_SLOT1:
         new_message = add_player_to_raid(username, message.text, raid_id, 0)
-    elif button_id is s.ADD_PLAYER_BUTTON_SLOT2:
+    elif button_id == s.ADD_PLAYER_BUTTON_SLOT2:
         new_message = add_player_to_raid(username, message.text, raid_id, 1)
-    elif button_id is s.ADD_PERSON_BUTTON:
+    elif button_id == s.ADD_PERSON_BUTTON:
         new_message = add_person_to_player(username, message.text, raid_id)
-    elif button_id is s.REMOVE_PERSON_BUTTON:
+    elif button_id == s.REMOVE_PERSON_BUTTON:
         new_message = remove_person_from_player(username, message.text, raid_id)
-    elif button_id is s.PLAYER_ARRIVED_BUTTON:
+    elif button_id == s.PLAYER_ARRIVED_BUTTON:
         new_message = player_has_arrived(username, message.text, raid_id)
-    elif button_id is s.REMOVE_PLAYER_BUTTON:
+    elif button_id == s.REMOVE_PLAYER_BUTTON:
         new_message = remove_player_from_raid(username, message.text, raid_id)
     r.save_raids_to_file()
     bot.edit_message_text(chat_id=s.group_chat_id, message_id=message.message_id, text=new_message, reply_markup=get_keyboard(raid_id), parse_mode=ParseMode.MARKDOWN, timeout=15)
 
 
-def extract_from_button(data):
-    splitted = data.split(",")
+def extract_from_button(data, delimiter):
+    splitted = data.split(delimiter)
     return splitted[0], splitted[1]
 
 
@@ -122,6 +157,8 @@ def add_handlers(dispatcher):
     dispatcher.add_handler(chat_id_handler)
     user_id_handler = CommandHandler('userid', get_user_id)
     dispatcher.add_handler(user_id_handler)
+    make_admin_handler = CommandHandler('makeAdmin', make_admin, pass_args=True, filters=Filters.user(s.get_admins()))
+    dispatcher.add_handler(make_admin_handler)
 
     add_test_raid_handler = CommandHandler('testRaid', add_test_raid, filters=Filters.user(s.get_admins()))
     dispatcher.add_handler(add_test_raid_handler)
@@ -162,7 +199,7 @@ def main():
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     add_handlers(dispatcher)
     if s.get_request_method() == "polling":
-        updater.start_polling(timeout=25)
+        updater.start_polling(timeout=30)
         print("Bot started polling!")
     else:
         wh = s.get_webhook_parameters()
