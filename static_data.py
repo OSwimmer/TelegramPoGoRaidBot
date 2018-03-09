@@ -34,13 +34,16 @@ LULZ = False
 
 
 def reload_config():
+    global config
     config.read("properties.ini")
 
 
 def dump_and_reload_config(section, field, value):
+    global config
     config.set(section, field, value)
     with open("properties.ini", "w+") as configfile:
         config.write(configfile)
+    reload_config()
 
 
 def get_token():
@@ -85,7 +88,17 @@ current_bosses = make_current_bosses_dict()
 
 
 def get_raid_backup_file():
-    return config["GameData"]["raid_backup_file"]
+    try:
+        return config["GameData"]["raid_backup_file"]
+    except KeyError:
+        return "raids.json"
+
+
+def get_user_backup_file():
+    try:
+        return config["TelegramSettings"]["user_backup_file"]
+    except KeyError:
+        return "users.json"
 
 
 def get_request_method():

@@ -24,7 +24,7 @@ The bot will send all the raid messages to this chat.
 
 # Running the bot
 
-If you have the source code, just execute the main.py script.
+If you have the source code, just execute the main.py script. **The bot is built using Python 3, older version are not guaranteed to work correctly!!!**  
 Otherwise run the executable (eg main.exe for Windows), this executable is created using [PyInstaller](http://www.pyinstaller.org/).
 You can create your own executable from the source code using ```pyinstaller -F main.py```, for more information check their site.
 

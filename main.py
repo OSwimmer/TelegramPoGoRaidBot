@@ -4,6 +4,7 @@ from conversation import get_add_raid_handler
 from keyboard import get_keyboard, get_admin_confirmation_keyboard
 import raid as r
 import static_data as s
+import users as u
 
 import logging, time, threading, random
 import datetime as dt
@@ -20,19 +21,54 @@ def get_user_id(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="user id is " + str(update.message.from_user.id))
 
 
+def greeting(bot, update):
+    user_id = update.message.from_user.id
+    username = update.message.from_user.username
+    u.add_user(user_id, username)
+    u.save_users_to_file()
+    bot.send_message(chat_id=update.message.chat_id, text="Hallo @%s, welkom in de groep!" % username)
+
+
 def make_admin(bot, update, args):
+    if len(args) == 0:
+        bot.send_message(chat_id=update.message.chat_id, text="Geef een naam op aub, bv: /makeAdmin SatoshiTajiri")
+        return
     username = args[0]
-    if not username.startswith("@"):
-        username = "@" + username
-    bot.send_message(chat_id=update.message.chat_id, text=username + ", wil jij admin worden? Beantwoord dit bericht met onderstaande knoppen.", reply_markup=get_admin_confirmation_keyboard(username))
+    user_id = u.get_user_id(username)
+    if user_id is not None:
+        if u.make_admin(user_id):
+            bot.send_message(chat_id=update.message.chat_id, text="@%s is nu een admin!" % username)
+        else:
+            bot.send_message(chat_id=update.message.chat_id, text="@%s is al een admin dus er is niets gebeurd!" % username)
+    else:
+        bot.send_message(chat_id=update.message.chat_id, text="Ik ken @%s nog niet, laat hem/haar zich voorstellen door /hallo te doen!" % username)
+    # if not username.startswith("@"):
+    #     username = "@" + username
+    # bot.send_message(chat_id=update.message.chat_id, text=username + ", wil jij admin worden? Beantwoord dit bericht met onderstaande knoppen.", reply_markup=get_admin_confirmation_keyboard(username))
+
+
+def remove_admin(bot, update, args):
+    if len(args) == 0:
+        bot.send_message(chat_id=update.message.chat_id, text="Geef een naam op aub, bv: /makeAdmin SatoshiTajiri")
+        return
+    username = args[0]
+    user_id = u.get_user_id(username)
+    if user_id is not None:
+        if u.remove_admin(user_id):
+            bot.send_message(chat_id=update.message.chat_id, text="@%s is verwijderd als admin!" % username)
+        else:
+            bot.send_message(chat_id=update.message.chat_id, text="@%s is geen admin dus er is niets gebeurd!" % username)
+    else:
+        bot.send_message(chat_id=update.message.chat_id, text="Ik ken %s niet. Check de naam of je de naam correct hebt geschreven." % username)
 
 
 def button(bot, update):
-    query = format(update.callback_query.data)
-    if query.startswith("accept") or query.startswith("deny"):
-        admin_button(bot, update)
-    else:
-        raid_button(bot, update)
+    raid_button(bot, update)
+    # query = format(update.callback_query.data)
+    # if query.startswith("accept") or query.startswith("deny"):
+    #     admin_button(bot, update)
+    # else:
+    #     raid_button(bot, update)
 
 
 def admin_button(bot, update):
@@ -50,9 +86,7 @@ def admin_button(bot, update):
             bot.edit_message_text(chat_id=message.chat_id, message_id=message.message_id, text="Ok @" + username + ", je wordt geen admin!", reply_markup=None)
         else:
             bot.edit_message_text(chat_id=message.chat_id, message_id=message.message_id, text="Ok @" + username + ", je bent nu een admin!", reply_markup=None)
-            admins = s.get_admins()
-            admins.append(from_user_id)
-            s.dump_and_reload_config("TelegramSettings", "admins", ", ".join(map(str, admins)))
+            u.make_admin(from_user_id)
 
 
 def raid_button(bot, update):
@@ -136,7 +170,7 @@ def add_test_raid(bot, update):
 
 
 def unknown(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="Sorry, ik versta dat commando niet, dit kan zijn doordat je geen admin bent.")
+    bot.send_message(chat_id=update.message.chat_id, text="Sorry, ik versta dat commando niet. Dit kan zijn doordat je geen admin bent.")
 
 
 def silence(bot, update):
@@ -144,6 +178,10 @@ def silence(bot, update):
 
 
 def load_state_from_file(bot, update):
+    if u.load_users_from_file():
+        bot.send_message(chat_id=update.message.chat_id, text="Users zijn succesvol ingeladen!")
+    else:
+        bot.send_message(chat_id=update.message.chat_id, text="Er was een probleem bij het inladen van de users, check of de config correct is.")
     if r.load_raids_from_file():
         bot.send_message(chat_id=update.message.chat_id, text="Raids zijn succesvol ingeladen!")
     else:
@@ -157,8 +195,12 @@ def add_handlers(dispatcher):
     dispatcher.add_handler(chat_id_handler)
     user_id_handler = CommandHandler('userid', get_user_id)
     dispatcher.add_handler(user_id_handler)
+    greeting_handler = CommandHandler('hallo', greeting)
+    dispatcher.add_handler(greeting_handler)
     make_admin_handler = CommandHandler('makeAdmin', make_admin, pass_args=True, filters=Filters.user(s.get_admins()))
     dispatcher.add_handler(make_admin_handler)
+    remove_admin_handler = CommandHandler('removeAdmin', remove_admin, pass_args=True, filters=Filters.user(s.get_admins()))
+    dispatcher.add_handler(remove_admin_handler)
 
     add_test_raid_handler = CommandHandler('testRaid', add_test_raid, filters=Filters.user(s.get_admins()))
     dispatcher.add_handler(add_test_raid_handler)
