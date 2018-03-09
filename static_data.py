@@ -99,7 +99,7 @@ def get_webhook_parameters():
     except KeyError:
         result["listen"] = '127.0.0.1'
     try:
-        result["port"] = config["TelegramSettings"]["port"]
+        result["port"] = int(config["TelegramSettings"]["port"])
     except KeyError:
         result["port"] = 80
     try:
