@@ -17,10 +17,12 @@ The bot will send all the raid messages to this chat.
 
 * _/chatid_ : gives the id of the current chat
 * _/userid_ : gives the id of the user issuing this command
+* _/hallo_ : introduces yourself to bot (needed for the makeAdmin and removeAdmin commands)
 * _/addRaid_ : starts the sequence to add a raid, follow the instructions given. Only for admins
 * _/testRaid_ : adds a completely randomized raid to the current chat (for testing purposes). Only for admins
-* _/recover_ :  loads the data from the backup file. THIS WILL REMOVE ANY RAIDS ALREADY PRESENT! Only for admins
-* _/makeAdmin X_ : makes the user with username X an admin for the bot if the user X accepts the message. Only for admins
+* _/recover_ :  loads the data from the backup files (raids and users). THIS WILL REMOVE ANY RAIDS ALREADY PRESENT! Only for admins
+* _/makeAdmin X_ : makes the user with username X an admin for the bot. Only for admins
+* _/removeAdmin X_ : removes the user with username X as admin for the bot. Only for admins
 
 # Running the bot
 
