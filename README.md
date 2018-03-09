@@ -39,3 +39,14 @@ and saves them in the parsed files. So normally you will never use this script a
 
 The properties.ini file is something you have to create from the example_properties.ini file using the instructions in the file and the "Using the bot" 
 section of this document.
+
+# Python Telegram Bot
+
+This program was made using the **Python Telegram bot**, see [GitHub](https://github.com/python-telegram-bot/python-telegram-bot) for the source code. 
+This framework is needed in order to run the bot. To install it, we refer to the link above. In short, it comes down to the following command:  
+```pip install python-telegram-bot --upgrade```  
+This framework is licensed with [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html).
+
+# License
+
+This program is licensed with [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html). For a summary, see the GitHub [License page](https://github.com/NielsVW/TelegramPoGoRaidBot/blob/master/LICENSE)
