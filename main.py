@@ -24,7 +24,7 @@ def make_admin(bot, update, args):
     username = args[0]
     if not username.startswith("@"):
         username = "@" + username
-    bot.send_message(chat_id=update.message.chat_id, text=username + ", wil jij admin worden? Beantwoord dit bericht met onderstaande knoppen", reply_markup=get_admin_confirmation_keyboard(username))
+    bot.send_message(chat_id=update.message.chat_id, text=username + ", wil jij admin worden? Beantwoord dit bericht met onderstaande knoppen.", reply_markup=get_admin_confirmation_keyboard(username))
 
 
 def button(bot, update):
@@ -136,7 +136,7 @@ def add_test_raid(bot, update):
 
 
 def unknown(bot, update):
-    bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
+    bot.send_message(chat_id=update.message.chat_id, text="Sorry, ik versta dat commando niet, dit kan zijn doordat je geen admin bent.")
 
 
 def silence(bot, update):

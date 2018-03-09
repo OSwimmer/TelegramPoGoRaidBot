@@ -67,8 +67,8 @@ def get_admins():
 
 
 def get_current_raid_bosses():
-    bosses = config["GameData"]["current_raid_bosses"].split(", ")
-    bosses = [x.capitalize() for x in bosses]
+    bosses = config["GameData"]["current_raid_bosses"].split(",")
+    bosses = [x.strip().capitalize() for x in bosses]
     return bosses
 
 
