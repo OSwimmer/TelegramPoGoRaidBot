@@ -1,4 +1,4 @@
-import configparser, json, datetime
+import configparser, json, datetime, time
 
 
 config = configparser.ConfigParser()
@@ -51,11 +51,17 @@ def get_token():
 
 
 def get_moves_file():
-    return config["GameData"]["moves_file"]
+    try:
+        return config["GameData"]["moves_file"]
+    except KeyError:
+        return "parsed_moves.json"
 
 
 def get_pokemon_file():
-    return config["GameData"]["pokemon_file"]
+    try:
+        return config["GameData"]["pokemon_file"]
+    except KeyError:
+        return "parsed_pokemon.json"
 
 
 moves = json.load(open(get_moves_file()))
@@ -102,7 +108,10 @@ def get_user_backup_file():
 
 
 def get_request_method():
-    return config["TelegramSettings"]["request_method"].lower()
+    try:
+        return config["TelegramSettings"]["request_method"].lower()
+    except KeyError:
+        return "polling"
 
 
 def get_webhook_parameters():
@@ -133,3 +142,13 @@ def get_webhook_parameters():
         result["webhook_url"] = None
     print(str(result))
     return result
+
+
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('%s function took %0.3f ms' % (f.__name__, (time2-time1)*1000.0))
+        return ret
+    return wrap
