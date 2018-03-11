@@ -29,7 +29,8 @@ def init_raid():
         "location": {},
         "opens": "",
         "timeslots": [],
-        "players": {}
+        "players": {},
+        "message_id": 0
     }
 
 
@@ -37,6 +38,7 @@ def remove_raid(raid_id):
     print("removed raid:\n" + str(raids.pop(raid_id, None)))
 
 
+# @s.timing
 def save_raids_to_file():
     try:
         with open(s.get_raid_backup_file(), 'w') as file:
@@ -44,7 +46,7 @@ def save_raids_to_file():
             out["global_raid_id"] = global_raid_id
             out["raids"] = raids
             json.dump(out, file, indent=2)
-    except OSError:
+    except:
         return False
     return True
 
@@ -56,7 +58,7 @@ def load_raids_from_file():
         from_file = json.load(open(s.get_raid_backup_file()))
         global_raid_id = from_file["global_raid_id"]
         raids = from_file["raids"]
-    except OSError:
+    except:
         return False
     return True
 
@@ -87,6 +89,14 @@ def remove_player_from_raid(username, raid_id):
 
 def player_has_arrived(username, raid_id):
     raids[raid_id]["players"][username]["arrived"] = True
+
+
+def get_message_id(raid_id):
+    return raids[raid_id]["message_id"]
+
+
+def set_message_id(raid_id, message_id):
+    raids[raid_id]["message_id"] = message_id
 
 
 def set_boss(raid_id, boss_id):
@@ -231,6 +241,14 @@ def roundTime(obj=None, roundTo=60):
 
 def to_bold(string):
     return "*" + string + "*"
+
+
+def check_raids():
+    result = []
+    for raid_id in raids.keys():
+        if not is_raid_ongoing(raid_id):
+            result.append(raid_id)
+    return result
 
 
 def get_raid_info_as_string(raid_id):

@@ -5,7 +5,7 @@ users = {}
 
 
 def add_user(user_id, username):
-    users[user_id] = username
+    users[str(user_id)] = username
 
 
 def add_user_id(user_id):
@@ -14,7 +14,7 @@ def add_user_id(user_id):
 
 def get_username(user_id):
     try:
-        result = users[user_id]
+        result = int(users[user_id])
     except KeyError:
         result = None
     return result
@@ -32,8 +32,9 @@ def save_users_to_file():
     try:
         with open(s.get_user_backup_file(), 'w') as file:
             json.dump(users, file, indent=2)
-    except OSError:
+    except:
         return False
+    print(str(users))
     return True
 
 
@@ -41,8 +42,9 @@ def load_users_from_file():
     global users
     try:
         users = json.load(open(s.get_user_backup_file()))
-    except OSError:
+    except:
         return False
+    print(str(users))
     return True
 
 

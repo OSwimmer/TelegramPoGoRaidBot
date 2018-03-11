@@ -1,16 +1,20 @@
 from telegram.ext import MessageHandler, Filters, CommandHandler, Updater, CallbackQueryHandler
 from telegram import ParseMode, Location
 from conversation import get_add_raid_handler
-from keyboard import get_keyboard, get_admin_confirmation_keyboard
+from keyboard import get_keyboard
 import raid as r
 import static_data as s
 import users as u
 
-import logging, time, threading, random
+import logging, time, threading, random, sys
 import datetime as dt
 
 
 current_day = dt.datetime.now().date()
+if sys.version_info[0] < 3:
+    print("version smaller than 3")
+    sys.reload(sys)
+    sys.setdefaultencoding('utf8')
 
 
 def get_chat_id(bot, update):
@@ -21,12 +25,9 @@ def get_user_id(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="user id is " + str(update.message.from_user.id))
 
 
-def greeting(bot, update):
-    user_id = update.message.from_user.id
-    username = update.message.from_user.username
+def save_user(user_id, username):
     u.add_user(user_id, username)
     u.save_users_to_file()
-    bot.send_message(chat_id=update.message.chat_id, text="Hallo @%s, welkom in de groep!" % username)
 
 
 def make_admin(bot, update, args):
@@ -42,9 +43,6 @@ def make_admin(bot, update, args):
             bot.send_message(chat_id=update.message.chat_id, text="@%s is al een admin dus er is niets gebeurd!" % username)
     else:
         bot.send_message(chat_id=update.message.chat_id, text="Ik ken @%s nog niet, laat hem/haar zich voorstellen door /hallo te doen!" % username)
-    # if not username.startswith("@"):
-    #     username = "@" + username
-    # bot.send_message(chat_id=update.message.chat_id, text=username + ", wil jij admin worden? Beantwoord dit bericht met onderstaande knoppen.", reply_markup=get_admin_confirmation_keyboard(username))
 
 
 def remove_admin(bot, update, args):
@@ -62,7 +60,11 @@ def remove_admin(bot, update, args):
         bot.send_message(chat_id=update.message.chat_id, text="Ik ken %s niet. Check de naam of je de naam correct hebt geschreven." % username)
 
 
+# @s.timing
 def button(bot, update):
+    user_id = update.callback_query.from_user.id
+    username = update.callback_query.from_user.username
+    save_user(user_id, username)
     raid_button(bot, update)
     # query = format(update.callback_query.data)
     # if query.startswith("accept") or query.startswith("deny"):
@@ -99,11 +101,10 @@ def raid_button(bot, update):
     data = format(query.data)
     new_message = message.text
     button_id, raid_id = extract_from_button(data, ",")
-    if not r.is_raid_ongoing(raid_id):
-        print("raid ended")
-        bot.edit_message_reply_markup(chat_id=s.group_chat_id, message_id=message.message_id, text=message.text, reply_markup=None, parse_mode=ParseMode.MARKDOWN)
-        r.remove_raid(raid_id)
-        return
+    for raid in r.check_raids():
+        print("raid %s ended" % raid)
+        bot.edit_message_reply_markup(s.group_chat_id, message_id=r.get_message_id(raid), reply_markup=None, parse_mode=ParseMode.MARKDOWN)
+        r.remove_raid(raid)
     if button_id == s.ADD_PLAYER_BUTTON_SLOT1:
         new_message = add_player_to_raid(username, message.text, raid_id, 0)
     elif button_id == s.ADD_PLAYER_BUTTON_SLOT2:
@@ -165,7 +166,8 @@ def add_test_raid(bot, update):
 
     reply_markup = get_keyboard(r.global_raid_id)
     bot.send_location(chat_id=s.group_chat_id, location=r.get_location_as_object(r.global_raid_id))
-    bot.send_message(chat_id=s.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
+    message = bot.send_message(chat_id=s.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
+    r.set_message_id(r.global_raid_id, message.message_id)
     r.increment_global_raid_id()
 
 
@@ -195,8 +197,6 @@ def add_handlers(dispatcher):
     dispatcher.add_handler(chat_id_handler)
     user_id_handler = CommandHandler('userid', get_user_id)
     dispatcher.add_handler(user_id_handler)
-    greeting_handler = CommandHandler('hallo', greeting)
-    dispatcher.add_handler(greeting_handler)
     make_admin_handler = CommandHandler('makeAdmin', make_admin, pass_args=True, filters=Filters.user(s.get_admins()))
     dispatcher.add_handler(make_admin_handler)
     remove_admin_handler = CommandHandler('removeAdmin', remove_admin, pass_args=True, filters=Filters.user(s.get_admins()))

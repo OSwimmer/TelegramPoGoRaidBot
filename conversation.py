@@ -101,7 +101,8 @@ def finalize_add(bot, update):
 def post_in_group(bot):
     reply_markup = get_keyboard(r.global_raid_id)
     bot.send_location(chat_id=s.group_chat_id, location=r.get_location_as_object(r.global_raid_id))
-    bot.send_message(chat_id=s.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
+    message = bot.send_message(chat_id=s.group_chat_id, text=r.get_raid_info_as_string(r.global_raid_id), reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN)
+    r.set_message_id(r.global_raid_id, message.message_id)
 
 
 def cancel(bot, update):
