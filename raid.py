@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import static_data as s
 import datetime as dt
 import json
